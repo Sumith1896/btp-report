@@ -1,13 +1,63 @@
-\documentclass[11pt]{report}
-\usepackage[margin=0.5in]{geometry}
+\documentclass[a4paper, twoside, 11pt]{report}
+\usepackage[
+  inner=30mm,
+  outer=20mm,
+%  textwidth=345pt,
+  top=15mm,
+  bottom=22mm
+]{geometry}
+
+%\usepackage[top=15mm, bottom=22mm]{geometry}
 \usepackage{fancyhdr}
 \usepackage{framed, color}
 \usepackage{graphicx}
 \usepackage{url}
 
-\title{\textbf{A Nice Project Title}}
+
+%% Let's do some macros
+
+\newenvironment{dedication}
+  {\clearpage           % we want a new page
+   \thispagestyle{empty}% no header and footer
+   \vspace*{\stretch{1}}% some space at the top 
+   \itshape             % the text is in italics
+   \center          % center of the page
+  }
+  {\par % end the paragraph
+   \vspace{\stretch{3}} % space at bottom is three times that at the top
+   \clearpage           % finish off the page
+}
+
+
+\makeatletter
+
+\newcommand\frontmatter{%
+    \cleardoublepage
+  %\@mainmatterfalse
+  \pagenumbering{roman}}
+
+\newcommand\mainmatter{%
+    \cleardoublepage
+ % \@mainmattertrue
+  \pagenumbering{arabic}}
+
+\newcommand\backmatter{%
+  \if@openright
+    \cleardoublepage
+  \else
+    \clearpage
+  \fi
+ % \@mainmatterfalse
+   }
+
+\makeatother
+
+
+  
+  
+\title{\textbf{Entity Relationship Keyword Queries \\ on Knowledge Graph}}
 \author{
-		\bf{B.Tech. Project Report}\\
+		\bf{Undergraduate Thesis Report}\\
         \\
         \emph{Submitted in partial fulfilment of requirements for the degree of}\\
         \\
@@ -15,12 +65,12 @@
         \\
         \emph{by}\\
         \\
-		\bf{Your Name}\\
-        \bf{Roll No : xxxxxxxxx}\\
+		\bf{Pratyaksh Sharma}\\
+        \bf{Roll No : 120050019}\\
         \\
         \emph{under the guidance of}\\
         \\
-		\bf{Prof. Prof Name}\\
+		\bf{Dr. S. Sudarshan}\\
         \\\\
         \includegraphics[height=3.5cm]{./iitb_logo.jpg}\\
         \\
@@ -33,21 +83,47 @@
 \bibliographystyle{plain}
 
 \begin{document}
+\frontmatter
+
 \maketitle
-\pagebreak
-\tableofcontents
-\pagebreak
+
+
+%%%% Dedications page %%%%
+\begin{dedication}
+To my parents, for their endless support \\
+ without ever having to ask me what I exactly do.
+\end{dedication}
+%%%% End dedications page %%%%
+
+
+%%%% Begin acknowledgements page %%%%
+\renewcommand{\abstractname}{Acknowledgements}
 
 \begin{abstract}
-
+hello
 \end{abstract}
+%%%% End acknowledgements page %%%%
+
+
+%%%% Begin abstract page %%%%
+\renewcommand{\abstractname}{Abstract}
+\begin{abstract}
+hey yo 
+\end{abstract}
+%%%% End abstract page %%%%
+
+
+\tableofcontents
+
+\mainmatter
+
+\pagestyle{fancy}
 \pagebreak
 
-\chapter*{Introduction}
+\input{./chapters/introduction.tex}
 
 
 \chapter*{Background}
-
 
 \chapter*{Work Done}
 
