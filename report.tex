@@ -20,6 +20,7 @@
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{fixltx2e}
+\usepackage{comment}
 
 \pagestyle{fancy}
 
@@ -99,15 +100,11 @@
 
 \maketitle
 
-\linespread{1.2}
-
-\setlength{\parindent}{2em}
-\setlength{\parskip}{0.5em}
-
 
 %%%% Dedications page %%%%
 \begin{dedication}
-To my parents,\\ who taught me the meaning of hardwork.
+To my parents, for their endless support \\
+and for teaching me the value of hardwork and discipline.
 \end{dedication}
 %%%% End dedications page %%%%
 
@@ -122,12 +119,14 @@ To my parents,\\ who taught me the meaning of hardwork.
   \\ \\
 Pratyaksh Sharma
 \end{abstract}
+\newpage
 %%%% End acknowledgements page %%%%
 
 
 %%%% Begin abstract page %%%%
 \renewcommand{\abstractname}{Abstract}
 \begin{abstract}
+ \addcontentsline{toc}{chapter}{Abstract}
   The proliferation of structured knowledge bases in recent times and their success in assisting web search has led to a good amount of research dedicated to querying these knowledge bases. While several approaches have been successful at supporting queries of a simple nature, the two main shortcomings of all approaches to querying knowledge bases are: 1) difficulty in formulating queries without familiarity with the knowledge-base schema, and 2) unsatisfactory performance, both in terms of resource (and time) consumption and accuracy of results. In this work, we first survey many of the approaches to various querying problems on structured data. We then present a novel query model and processing framework that will address the deficiencies of existing approaches, in particular, towards supporting complex queries.
 
 \end{abstract}
@@ -137,6 +136,10 @@ Pratyaksh Sharma
 \tableofcontents
 
 \mainmatter
+
+\linespread{1.2}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.5em}
 
 
 \pagebreak
@@ -149,11 +152,10 @@ Pratyaksh Sharma
 
 \input{./chapters/main.tex}
 
-\input{./chapters/implementation.tex}
+%\input{./chapters/implementation.tex}
 
 \input{./chapters/futurework.tex}
 
 \bibliography{report}
 
 \end{document}
-
