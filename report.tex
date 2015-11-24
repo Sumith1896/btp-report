@@ -1,9 +1,9 @@
-\documentclass[a4paper, twoside, 11pt]{report}
+\documentclass[a4paper, twoside, 12pt]{report}
 \usepackage[
   inner=30mm,
   outer=20mm,
 %  textwidth=345pt,
-  top=15mm,
+  top=24mm,
   bottom=22mm
 ]{geometry}
 
@@ -13,6 +13,9 @@
 \usepackage{graphicx}
 \usepackage{url}
 
+\pagestyle{fancy}
+
+\graphicspath{{./images/}}
 
 %% Let's do some macros
 
@@ -72,7 +75,7 @@
         \\
 		\bf{Dr. S. Sudarshan}\\
         \\\\
-        \includegraphics[height=3.5cm]{./iitb_logo.jpg}\\
+        \includegraphics[height=3.5cm]{iitb_logo.jpg}\\
         \\
 		\bf{Department of Computer Science and Engineering}\\
         \bf{Indian Institute of Technology Bombay}\\
@@ -100,7 +103,9 @@ To my parents, for their endless support \\
 \renewcommand{\abstractname}{Acknowledgements}
 
 \begin{abstract}
-hello
+  I must acknowledge a great debt to my advisor, Professor S. Sudarshan, for his constant advice has been the guiding force throughout and without which, this work would never have been possible. 
+  \\ \\
+Pratyaksh Sharma
 \end{abstract}
 %%%% End acknowledgements page %%%%
 
@@ -108,7 +113,8 @@ hello
 %%%% Begin abstract page %%%%
 \renewcommand{\abstractname}{Abstract}
 \begin{abstract}
-hey yo 
+  The proliferation of structured knowledge bases in recent times and their success in assisting web search has led to a good amount of research dedicated to querying these knowledge bases. While several approaches have been successful at supporting queries of a simple nature, the two main shortcomings of all approaches to querying knowledge bases are: 1) difficulty in formulating queries without familiarity with the knowledge-base schema, and 2) unsatisfactory performance, both in terms of resource (and time) consumption and accuracy of results. In this work, we first survey many of the approaches to various querying problems on structured data. We then present a novel query model and processing framework that will address the deficiencies of existing approaches, in particular, towards supporting complex queries.
+
 \end{abstract}
 %%%% End abstract page %%%%
 
@@ -117,22 +123,21 @@ hey yo
 
 \mainmatter
 
-\pagestyle{fancy}
+
 \pagebreak
 
 \input{./chapters/introduction.tex}
 
+\input{./chapters/background.tex}
 
-\chapter*{Background}
+\input{./chapters/relatedwork.tex}
 
-\chapter*{Work Done}
+\input{./chapters/main.tex}
 
-\chapter*{Conclusion and Summary}
-
-\section*{Future Work}
+\input{./chapters/futurework.tex}
 
 
-\section*{Summary}
+
 
 \begin{thebibliography}{9}
 
