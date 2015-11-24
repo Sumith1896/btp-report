@@ -83,14 +83,14 @@ Even when we depend on the user's input for disambiguation of the query, we cann
 \subsection{Predicate Selection}
 A naive approach to populate the set of candidate predicates, would be to scan all possible predicates and discard those whose \emph{descriptions} do not match with the specified relation keywords $R_{ij}$. It is also possible to create a full text index on the predicate descriptions and to query it using $R_{ij}$. As can be expected, this approach is too simple and yields a large set of candidate predicates.
 
-The choice of candidate predicates $p_{ij}$ can be improved by using the category keywords $C_i, C_j$ and the selector keywords $K_i, K_j$ for the entity variables $x_i$ and $x_j$ that are related by $p_{ij}$. Following the success of generative models in entity search \cite{sawant2013learning}, we explore a generative language model for joint query interpretation for choosing candidate predicates.
+The choice of candidate predicates $p_{ij}$ can be improved by using the category keywords $C_i, C_j$ and the selector keywords $K_i, K_j$ for the entity variables $x_i$ and $x_j$ that are related by $p_{ij}$. Following the success of generative models in entity search \cite{sawant2013learning}, we propose a generative language model for joint query interpretation for choosing candidate predicates.
 
 Let $\vec{q} = (R_{ij}, C_i, C_j, K_i, K_j)$ denote the part of the query pertaining to the predicate $p_{ij}$ and entities $x_i$, $x_j$. We are interested in $\argmax_{p}$Pr$(p|\vec{q})$, where
 \begin{align}\label{eq:1}
 \text{Pr}(p|\vec{q}) &\propto \text{Pr}(p, \vec{q}) = \text{Pr}(p)\cdot \text{Pr}(\vec{q}|p) = \text{Pr}(p)\cdot \sum_{t_{i}, t_{j}} \text{Pr}(\vec{q}, t_i, t_j | p) \\
 &= \text{Pr}(p)\cdot \sum_{t_{i}, t_{j}} \text{Pr}(R_{ij}, C_i, C_j, K_i, K_j, t_i, t_j| p) \\
-&= \text{Pr}(p)\cdot \sum_{t_{i}, t_{j}} \text{Pr}(R_{ij}|p)\cdot\underbrace{\text{Pr}(t_i,t_j|R_{ij},p)}_\text{(I)}\cdot\underbrace{\text{Pr}(C_i,C_j|t_i,t_j,R_{ij},p)}_\text{(II)}\cdot \text{Pr}(K_i,K_j|C_i,C_j,t_i,t_j,R_{ij},p)
-%&= \text{Pr}(p)\sum_{t_i, t_j, e_i, e_j} \text{Pr}(R_{ij}|p)\text{Pr}(t_i,t_j|R_{ij},p)\text{Pr}(e_i, e_j|t_i, t_j, R_{ij}, p) \text{Pr}(C_i,C_j|e_i,e_j,t_i,t_j,R_{ij},p) \phi_1
+&= \text{Pr}(p)\cdot \sum_{t_{i}, t_{j}} \text{Pr}(R_{ij}|p)\cdot\underbrace{\text{Pr}(t_i,t_j|R_{ij},p)}_\text{(I)}\cdot\underbrace{\text{Pr}(C_i,C_j|t_i,t_j,R_{ij},p)}_\text{(II)}\cdot \phi_1 \label{eq:omphi1}
+%&= \text{Pr}(p)\sum_{t_i, t_j, e_i, e_j} \text{Pr}(R_{ij}|p)\text{Pr}(t_i,t_j|R_{ij},p)\text{Pr}(e_i, e_j|t_i, t_j, R_{ij}, p) \text{Pr}(C_i,C_j|e_i,e_j,t_i,t_j,R_{ij},p)
 \end{align}
 where $\phi_1$ is defined as:
 \begin{align}
@@ -108,12 +108,12 @@ Latent variables $t_i, t_j$ are introduced in (\ref{eq:1}), representing the typ
 
 Thus, we now have:
 \begin{align}
-\text{Pr}(p|\vec{q}) &\propto \text{Pr}(p)\cdot \sum_{t_{i}, t_{j}} \text{Pr}(R_{ij}|p)\cdot \text{Pr}(t_i,t_j|p) \cdot \text{Pr}(C_i|t_i) \cdot \text{Pr}(C_j|t_j) \cdot \underbrace{\text{Pr}(K_i,K_j|C_i,C_j,t_i,t_j,R_{ij},p)}_\text{(III)} \label{eq:main2}
+\text{Pr}(p|\vec{q}) &\propto \text{Pr}(p)\cdot \sum_{t_{i}, t_{j}} \text{Pr}(R_{ij}|p)\cdot \text{Pr}(t_i,t_j|p) \cdot \text{Pr}(C_i|t_i) \cdot \text{Pr}(C_j|t_j) \cdot \underbrace{\phi_1}_\text{(III)} \label{eq:main2}
 \end{align}
 
-Furthermore, by introducing the latent variables $e_i$ and $e_j$ for entities represented by $x_i$ and $x_j$ in the query, we can rewrite (III) as:
+Furthermore, by introducing the latent variables $e_i$ and $e_j$ for entities represented by $x_i$ and $x_j$ in the query, we can rewrite $\phi_1$ as:
 \begin{align}
-\text{Pr}(K_i,K_j|&C_i,C_j,t_i, t_j,R_{ij},p) = \sum_{e_i,e_j}\text{Pr}(K_i,K_j,e_i,e_j|C_i,C_j,t_i,t_j,R_{ij},p) \\
+\phi_1 = \text{Pr}(K_i,K_j|&C_i,C_j,t_i, t_j,R_{ij},p) = \sum_{e_i,e_j}\text{Pr}(K_i,K_j,e_i,e_j|C_i,C_j,t_i,t_j,R_{ij},p) \\
 &= \sum_{e_i,e_j} \underbrace{\text{Pr}(e_i,e_j|C_i,C_j,t_i,t_j,R_{ij},p)}_\text{(IV)} \cdot \underbrace{\text{Pr}(K_i,K_j|e_i,e_j,C_i,C_j,t_i,t_j,R_{ij},p)}_\text{(V)} \label{eq:ugly2}
 \end{align}
 
@@ -135,16 +135,43 @@ where $\phi_2$ is defined as,
 \begin{align}
 \phi_2 = \text{Pr}(R_{ij}|p) \cdot \text{Pr}(t_i,t_j|p) \cdot \text{Pr}(C_i|t_i) \cdot \text{Pr}(C_j|t_j) \cdot \text{Pr}(e_i,e_j|t_i,t_j,p) \cdot \text{Pr}(K_i|e_i) \cdot \text{Pr}(K_j|e_j) \label{eq:phi2}
 \end{align}
-Arguments of function $\phi_1$ are omitted in Equation \ref{eq:phi1} for the lack of horizontal space.
+Arguments to functions $\phi_1$ and $\phi_2$ are omitted in Equations \ref{eq:omphi1}, \ref{eq:main2}, \ref{eq:ugly2} and \ref{eq:phi2}  for the lack of horizontal space.
 
-We now proceed to describe how the above quantities will be estimated.
+Throughout this section we have dealt with probabilities and have ultimately arrived at a set of probabilities to be computed. We understand that such probabilities in the Bayesian sense of the word are hard to estimate, if at all well defined. We therefore, tweak our notation a little, replacing probabilities $\text{Pr}$ with potentials $\psi$. The entire derivation continues to hold, even with the modified semantics. 
 
-\subsubsection{Estimating $\text{Pr}(p)$}
-$\text{Pr}(p)$ is simply the prior on the predicate $p$. We estimate it as:
-$$\text{Pr}(p) \approx \frac{\text{freq}(p)}{\sum_{p_i \in \mathbb{P}}\text{freq}(p_i)}$$
-where $\mathbb{P}$ is the set of all possible predicates. 
+For the rest of this chapter, we use the following notation:
+\begin{enumerate}
+  \item $\psi(p)$ in place of $\text{Pr}(p)$: represents the prior weight on the predicate $p$
+  \item $\psi(R_{ij}, p)$ in place of $\text{Pr}(R_{ij}|p)$: represents the \emph{compatibility} of keywords $R_{ij}$ and predicate $p$
+  \item $\psi(C_i, t_i)$ in place of $\text{Pr}(C_i|t_i)$: represents the \emph{compatibility} of keywords $C_i$ and a Freebase type $t_i$
+  \item $\psi(K_i, e_i)$ in place of $\text{Pr}(K_i|e_i)$: represents the \emph{compatibility} of keywords $K_i$ and the Freebase entity $e_i$
+  \item $\psi(t_i, p, t_j)$ in place of $\text{Pr}(t_i, t_j|p)$: represents the \emph{compatibility} of the predicate $p$ with the Freebase types $t_i$ and $t_j$
+  \item $\psi(e_i, e_j, t_i, t_j, p)$ in place of $\text{Pr}(e_i, e_j | t_i, t_j, p)$: represents the \emph{compatibility} of Freebase entities $e_i$ and $e_j$ with Freebase types $t_i$ and $t_j$ respectively, and of the entities with the Freebase predicate $p$
+\end{enumerate}
 
-\subsubsection{Estimating $\text{Pr}(R_{ij}|p)$, $\text{Pr}(C_i|t_i)$, and $\text{Pr}(K_i|e_i)$}
+The potentials $\psi$ used above can be compactly represented as an undirected probabilistic graphical model. We omit the discussion towards this direction for brevity and proceed straight to describing how the above quantities will be estimated.
+
+\subsubsection{Estimating $\psi(p)$}
+$\psi(p)$ is simply the prior on the predicate $p$. We estimate it as:
+$$\psi(p) \approx \frac{\text{freq}(p)}{\sum_{p_i \in \mathbb{P}}\text{freq}(p_i)}$$
+where $\mathbb{P}$ is the set of all possible predicates in our RDF data source. 
+
+\subsubsection{Estimating $\psi(R_{ij}, p)$, $\psi(C_i, t_i)$, and $\psi(K_i, e_i)$}
+The  potentials $\psi(R_{ij}, p)$, $\psi(C_i, t_i)$, and $\psi(K_i, e_i)$ are similar in the sense that they all capture the agreement between two variables: one of them being keywords supplied in the user query and the other being a predicate, type, or an entity in the structured data source. 
+For example, if the the relation keywords $R_{ij}$ are \texttt{"death reason"} and the related entity sought is of type \texttt{person}, then $R_{ij}$ should match to the 
+predicate \texttt{/people/} \texttt{deceased\_person/} \texttt{cause\_of\_death} rather than the predicate \texttt{/people/} \texttt{deceased\_person/} \texttt{place\_of\_death}.
+
+There may exist considerable variation in how keywords are represented in a query. The relation language model needs to build a bridge between the formal $p$ and the textual $R_{ij}$, so that (un)likely $p$'s have (small) large potential. Plenty of approaches \cite{berant2013semantic, berant2014semantic, kwiatkowski2013scaling, yih2014semantic} to this problem have been studied recently. We choose a pattern-based approach akin to PATTY \cite{nakashole2012patty} for its simplicity and scalability to large amounts of data.
+
+For each Freebase predicate $p$, we discover the most strongly associated phrase patterns from a reference corpus, then mark these patterns into much larger payload corpus. 
+The ClueWeb09 corpus annotated with Freebase entities \cite{gabrilovich2013facc1} may be used for this purpose. For each Freebase predicate $p$, we consider all triples and locate all the corpus sentences that mention both the participating entities of the triple. We assume, rather crudely, that if the entities $e_i$ and $e_j$ co-occur in a sentence then this sentence is an evidence of the triple <$e_i, p, e_j$>. Each such sentence is parsed to obtain a dependency graph using the Malt Parser \cite{nivre2007maltparser}
+
+We present the approach towards estimating $\psi(R_{ij}, p)$; those for $\psi(C_i, t_i)$ and $\psi(K_i, e_i)$ will be similar and shall be added in later versions of this work. The following brief description is based on \cite{joshiknowledge}.
+
+Words in the path connecting the entities are joined together and added to a candidate phrase dictionary, provided the path is at most k-hops (k is chosen experimentally, we expect that longer dependency paths arise out of noisy sentences/parsing). Thus, we have, for all predicates $p$, a list $\mathbb{R}_{ij}$ of all phrases that are known to hint at $p$. We can then estimate $\psi(R_{ij}, p)$ as:
+\begin{align}
+\psi(R_{ij}, p) = \frac{n(p, R_{ij})}{\sum_{R'_{ij} \in \mathbb{R}_{ij}}{n(p, R'_{ij})}}
+\end{align}
 
 \subsubsection{Estimating $\text{Pr}(t_i,t_j|p)$}
 
