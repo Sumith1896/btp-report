@@ -56,7 +56,7 @@ Many of the contemporary freely accessible knowledge bases support their distrib
 
 \section[SPARQL]{SPARQL Protocol and RDF Query Language}
 
-SPARQL (recursive acronym for SPARQL Protocol and RDF Query Language) is a semantic query language for RDF databases. SPARQL allows users to write queries against what can loosely be described as ``key-value" data or, more specifically, data that follows the RDF specification of the W3C. 
+SPARQL\cite{prud2008sparql} (recursive acronym for SPARQL Protocol and RDF Query Language) is a semantic query language for RDF databases. SPARQL allows users to write queries against what can loosely be described as ``key-value" data or, more specifically, data that follows the RDF specification of the W3C. 
 
 Though we earlier presented the RDF data model as a graph, it can also be thought of in terms of the SQL relational model as a table with three columns, one each for the subject, the predicate and the object. As we noticed earlier, the data in the object column can be heterogeneous in general, which in contrast with relational databases. The column data type is usually implied by the predicate value or may be specified separately in an ontology. 
 
@@ -89,11 +89,38 @@ It is worth noting that triple patterns allow a natural way of expressing joins 
 
 SPARQL has been implemented in a number of programming languages and graph databases. In particular the Apache Jena Framework and Openlink Virtuoso are widely used implementations of the standard.
 
-\section{The Freebase Knowledge Base}
+\section{Freebase Knowledge Base}
 
-What was it?
+A major prerequisite for the success of Semantic Web is clearly the availability of large amounts of structured data. The effort of building and maintaining comprehensive datasets is largely divided in purpose and content by the organizations supporting these projects. At one end, there are freely accessible knowledge bases such as DBpedia, Wikidata, and Freebase; and at the other there are closed source projects such as Google Knowledge Graph and the Wolfram Knowledgebase. 
 
-Current status
+For most of our work, we decided to stick to Freebase as our underlying data source. The choice demands us to tweak our approaches slightly to make use of the Freebase schema. Still, the ideas presented are sufficiently general and can be adapted to any of the popular knowledge bases.
 
-Idiosyncrasies
+Freebase was a large collaborative knowledge base with data curated mainly by its community members. It first appeared in 2007 and was originally developed by the company Metaweb \footnote{en.wikipedia.org/wiki/Metaweb}. Though the project is no longer active, the complete data is available freely through Google Developers\footnote{developers.google.com/freebase}.
 
+Freebase contains tens of millions of topics, thousands of types, and tens of thousands of properties. There are more than a billion facts (loosely, RDF triples) that make up the Freebase graph. The magnitude can be appreciated on the comparison with Wikipedia, which has less than 5 million English articles. 
+
+\subsection{Schema}
+
+The nodes of the Freebase graph are defined using \texttt{/type/object/} and the edges are defined using \texttt{/type/link/}.
+
+Freebase has over 39 million topics about real-world entities like people, places and things. Since Freebase data is represented a graph, these topics correspond to the nodes in the graph. However, not every node is a topic.
+
+Examples of the types of topics found in Freebase:
+\begin{itemize}
+  \item Physical entities, e.g., Bob Dylan, the Louvre Museum, the Saturn planet, to
+  \item Artistic/media creations, e.g., The Dark Knight (film), Hotel California (song), to
+  \item Classifications, e.g., noble gas, Chordate, to
+  \item Abstract concepts, e.g., love, to
+  \item Schools of thoughts or artistic movements, e.g., Impressionism.
+\end{itemize}
+
+
+Any Freebase topic can be seen from different perspectives, For example: Bob Dylan was a song writer, singer, performer, book author, and film actor. In order to capture this multi-faceted nature of many topics, Freebase defines the concept of types. Topics in Freebase can have any number of types assigned to them. The topic about Bob Dylan is assigned several types: the song writer type, the music composer type, the music artist (singer) type, the book author type, etc. Each type carries a different set of properties germane to that type. For example,
+\begin{itemize}
+\item The music artist type contains a property that lists all the albums that Bob Dylan has produced as well as all the music instruments he was known to play;
+\item The book author type contains a property that lists all the books Bob Dylan has written or edited, as well as his writing school of thoughts or movement;
+\item The company type contains many property for listing a company's founders, board members, parent company, divisions, employees, products, year-by-year revenue and profit records, etc.
+\end{itemize}
+Thus, a type can be thought of as a conceptual container of properties that are most commonly needed for describing a particular aspect of information.
+
+We shall describe other features of the Freebase schema, as and when required in the later chapters.

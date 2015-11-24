@@ -1,1 +1,172 @@
-\chapter{Our approach}
+\chapter[ER Keyword Querying]{Entity Relationship Keyword Queries}
+
+% TODO complete outline
+In this chapter, we present a detail discussion of our approach towards supporting keyword queries and the techniques used. 
+
+\section{Query Model}
+
+The notion of Entity Relationship Query (ERQ) or Shallow Semantic Query (SSQ) is defined by \cite{li2010structured, li2012entity} as a powerful and flexible query form which allows users to specify expected entity types or categories along with selection predicates for entities and relation predicates for relationship between entities.
+
+For example, a query described as ``Find PERSON \emph{near} \underline{`Stanford graduate'}, and COMPANY \emph{near} \underline{`Silicon Valley'}, where PERSON \underline{founded} COMPANY" can be described in ERQ form as in Figure \ref{fig:erq}.
+
+\begin{figure}[h!]
+\centering
+\begin{BVerbatim}
+SELECT x, y
+FROM PERSON x, COMPANY y
+WHERE x:['Stanford', 'graduate']
+WHERE y:["Silicon Valley"]
+AND x,y:['found']
+\end{BVerbatim}
+\caption{An example ER Query}
+\label{fig:erq}
+\end{figure}
+
+The query of Figure \ref{fig:erq} seeks the entity pairs \texttt{(x, y)} such that entity \texttt{x} is of type \texttt{PERSON} (and further a Stanford graduate), entity \texttt{y} is of type \texttt{COMPANY} (in particular, a Silicon Valley company) and \texttt{x} has founded \texttt{y}. \texttt{x} and \texttt{y} are entity variables that will bind to entities in the query result. \texttt{PERSON} and \texttt{COMPANY} describe the category/types of these entities. \texttt{"Stanford graduate"} and \texttt{"Silicon Valley"} play the role of selector keywords for entities \texttt{x} and \texttt{y} respectively. Finally, \texttt{found} is the relation keyword describing the relationship between entities \texttt{x} and \texttt{y}.
+
+To make our discussion convenient, we formalize the notion of ERQ as follows. Our system expects the user to specify:
+
+\begin{itemize}
+\item The number of entities ($n$) desired in a result. The entity variables will be referred to as $x_1, x_2, ..., x_n$.
+\item A list of category keywords $C_i$ for each entity variable $x_i$.
+\item A list of \emph{selector keywords} $K_i$ for each entity variable $x_i$.
+\item A list of relation keywords $R_{ij}$ describing the relationship between entities $x_i$ and $x_j$ for all $i \neq j$.
+\end{itemize}
+
+The result of the query shall be one or more $n$-tuples, where $n$ is as specified in the query. In particular, the elements of the tuple bind to entity variables $(x_1, x_2, ..., x_n)$.
+
+The category keywords are used to specify what category or type the corresponding entity falls in. Selector keywords desire that the corresponding entity be \emph{associated} with these words. Relation keywords specify the relation predicates, in the same manner as ERQ. It is worth noting that each of $C_i$, $K_i$, and $R_{ij}$ may be left empty (unspecified) by the user. The user is also not expected to specify these query keywords in conformity with the schema of the queried RDF graph.
+
+We now illustrate another example to ease understanding of our ERQ formalism. Suppose we want to find the parent-child pairs of US presidents who have attended the same university. Such a query is demanding three entities $x_1$, $x_2$, and $x_3$---$x_1, x_2$ are the presidents, and $x_3$ their common alma mater. A user may formulate the query in the following manner:
+
+\begin{itemize}
+\item Number of entities is 3.
+\item $C_1=$\{`person'\}, $C_2=$\{`person'\}, and $C_3=$\{`university'\}.
+\item $K_1=$\{`US', `President'\}, $K_2=$\{`US', 'President'\}, and $K_3=$\{\}.
+\item $R_{12}=$\{`parent'\}, $R_{13}=$\{`education'\}, and $R_{23}=$\{`education'\}, 
+\end{itemize}
+
+As we observed in Chapter 3, the problem of segmenting a user keyword query into the keywords for type/categories of entities sought and those for describing relationship between these entities inherently limits the performance (in both precision and recall) of the querying system. The ER query model might seem like a convenient ignorance of such issues, and in many ways it is. Our stance is that ER queries do not expect the amount of user sophistication that SPARQL querying systems expect. It is a sweet compromise between SPARQL querying and free-keyword querying that allows us to focus on challenges beyond query segmentation. Further, we believe that our ideas in this work can be supplemented with a layer of query segmentation---enabling free-keyword querying. 
+
+\section{Query Processing}
+
+The central goal of our work is to enable users to query structured knowledge bases without expecting \emph{any} schema knowledge whatsoever. In the context of the ER query model described previously, this means that keywords supplied in a user query will not in general match those used for data representation in the underlying data source. For example, a user might use the relation keyword \texttt{"established"} to mean ``establishment" of a company or an organization; but in the data source, the actual predicate sought could be \texttt{"founded"}---which roughly means the same as \texttt{"established"} in case of companies. 
+
+Therefore, to achieve superior recall, we must explore many possible \emph{meanings} of a keyword used by the user. 
+
+Further, a user specified keyword could be ambiguous, in the sense that it could could mean any of a number of entities/predicates in the data. To achieve superior precision, we must be able to disambiguate the intent of the user query. 
+
+Our approach towards the above two problems is of asking the user for help. More concretely, our query processing engine shall prompt the user to select a subset of intermediate \emph{candidate} that entities or predicates that the system might be evaluating during query processing. 
+
+Overall, the query processing proceeds with the repeated execution of two steps: 1) Predicate Selection, and 2) Entity Selection.
+
+\subsection{Predicate selection}
+
+As we assume that the user has no familiarity with representation of the underlying data, the relation keywords $R_{ij}$ specified by the user can not, in general, identify a unique predicate in the RDF graph. Therefore, in this stage, the system presents a set of candidate predicates that match the given relation keywords $R_{ij}$. The user is then expected to select of subset of these predicates that align with her intent. It is to be ensured that a small enough, yet accurate enough set of candidate predicates is presented to the user, in order to minimize user effort. This step, referred to as predicate selection for $p_{ij}$, is performed for each of the relations $x_i \sim x_j$ specified initially by the user.
+
+\subsection{Entity selection}
+
+After the user has selected desired set of predicates $\{p^1_{ij}, p^2_{ij}, ..., p^r_{ij}\}$ that comply with the given relation keywords $R_{ij}$, the system shall try to determine the entities $x_i$ and $x_j$ obeying any of these relations.
+
+The RDF graph is queried to find all entities $x_i$ and $x_j$ that match the triple pattern $<?x_i, p^k_{ij}, ?x_j>$ ($k = 1,...,r)$. By the sets $X_i$ and $X_j$, we mean the set of candidate entities thus obtained for entity variables $x_i$ and $x_j$, respectively. These sets $X_i$ and $X_j$ are further filtered, based on the category keywords $C_i$, $C_j$, and selector keywords $K_i$, $K_j$. The resulting sets $\tilde{X_i}$ and $\tilde{X_j}$ obtained after filtering are presented as candidate entities for entity variables $x_i$ and $x_j$.
+
+At this step, the user is expected to select a subset of these entities that align with her intent. As in the case of predicate selection, it is to be ensured that a small enough, yet accurate set of candidate entities is presented to the user. The entity selection step for entity variables $x_i$ and $x_j$ is performed after the predicate selection step for $p_{ij}$.
+
+Once the user agrees on a set of candidate entities $\tilde{X_i}$ for entity variable $x_i$, this information will be used to reduce the complexity of the further entity selection stages. This process terminates when predicate selection and entity selection has been performed for each predicate and entity in the query. The entity-relation graphs are finally ranked and returned to the user as query results.
+
+\subsection{An Example}
+
+
+\section{Query Interpretation}
+Even when we depend on the user's input for disambiguation of the query, we cannot simply blurt out a large set of candidate entities/predicates, for might the user be overwhelmed. Thus, we face the problem of giving an intermediate ranking to candidate entities/predicates, which can then be used to lower down the size of candidate set exposed to the user (in a top-k fashion).
+
+\subsection{Predicate Selection}
+A naive approach to populate the set of candidate predicates, would be to scan all possible predicates and discard those whose \emph{descriptions} do not match with the specified relation keywords $R_{ij}$. It is also possible to create a full text index on the predicate descriptions and to query it using $R_{ij}$. As can be expected, this approach is too simple and yields a large set of candidate predicates.
+
+The choice of candidate predicates $p_{ij}$ can be improved by using the category keywords $C_i, C_j$ and the selector keywords $K_i, K_j$ for the entity variables $x_i$ and $x_j$ that are related by $p_{ij}$. Following the success of generative models in entity search \cite{sawant2013learning}, we explore a generative language model for joint query interpretation for choosing candidate predicates.
+
+Let $\vec{q} = (R_{ij}, C_i, C_j, K_i, K_j)$ denote the part of the query pertaining to the predicate $p_{ij}$ and entities $x_i$, $x_j$. We are interested in $\argmax_{p}$Pr$(p|\vec{q})$, where
+\begin{align}\label{eq:1}
+\text{Pr}(p|\vec{q}) &\propto \text{Pr}(p, \vec{q}) = \text{Pr}(p)\cdot \text{Pr}(\vec{q}|p) = \text{Pr}(p)\cdot \sum_{t_{i}, t_{j}} \text{Pr}(\vec{q}, t_i, t_j | p) \\
+&= \text{Pr}(p)\cdot \sum_{t_{i}, t_{j}} \text{Pr}(R_{ij}, C_i, C_j, K_i, K_j, t_i, t_j| p) \\
+&= \text{Pr}(p)\cdot \sum_{t_{i}, t_{j}} \text{Pr}(R_{ij}|p)\cdot\underbrace{\text{Pr}(t_i,t_j|R_{ij},p)}_\text{(I)}\cdot\underbrace{\text{Pr}(C_i,C_j|t_i,t_j,R_{ij},p)}_\text{(II)}\cdot \text{Pr}(K_i,K_j|C_i,C_j,t_i,t_j,R_{ij},p)
+%&= \text{Pr}(p)\sum_{t_i, t_j, e_i, e_j} \text{Pr}(R_{ij}|p)\text{Pr}(t_i,t_j|R_{ij},p)\text{Pr}(e_i, e_j|t_i, t_j, R_{ij}, p) \text{Pr}(C_i,C_j|e_i,e_j,t_i,t_j,R_{ij},p) \phi_1
+\end{align}
+where $\phi_1$ is defined as:
+\begin{align}
+\phi_1(K_i,K_j,C_i,C_j,e_i,e_j,t_i,t_j,R_{ij},p) = \text{Pr}(K_i,K_j|C_i,C_j,e_i,e_j,t_i,t_j,R_{ij},p) \label{eq:phi1}
+\end{align}
+Latent variables $t_i, t_j$ are introduced in (\ref{eq:1}), representing the types of the entities $x_i$ and $x_j$ respectively. The expressions (I) and (II) can be simplified, using the following reasonable independence assumptions:
+
+\begin{enumerate}
+\item $\text{Pr}(t_i,t_j|R_{ij},p) = \text{Pr}(t_i,t_j|p)$, i.e., the relation keywords $R_{ij}$ do not convey any extra information when the predicate $p$ is known.
+
+\item $\text{Pr}(C_i,C_j|t_i,t_j,R_{ij},p) = \text{Pr}(C_i,C_j|t_i,t_j)$, i.e., the category keywords are independent of $R_{ij}$ and $p$, once $t_i$ and $t_j$ are known.
+
+\item $\text{Pr}(C_i,C_j|t_i,t_j) = \text{Pr}(C_i|t_i) \cdot \text{Pr}(C_j|t_j)$, i.e., $C_i$ and $C_j$ are independent of each other and of any types other than $t_i$ and $t_j$, respectively.  
+\end{enumerate}
+
+Thus, we now have:
+\begin{align}
+\text{Pr}(p|\vec{q}) &\propto \text{Pr}(p)\cdot \sum_{t_{i}, t_{j}} \text{Pr}(R_{ij}|p)\cdot \text{Pr}(t_i,t_j|p) \cdot \text{Pr}(C_i|t_i) \cdot \text{Pr}(C_j|t_j) \cdot \underbrace{\text{Pr}(K_i,K_j|C_i,C_j,t_i,t_j,R_{ij},p)}_\text{(III)} \label{eq:main2}
+\end{align}
+
+Furthermore, by introducing the latent variables $e_i$ and $e_j$ for entities represented by $x_i$ and $x_j$ in the query, we can rewrite (III) as:
+\begin{align}
+\text{Pr}(K_i,K_j|&C_i,C_j,t_i, t_j,R_{ij},p) = \sum_{e_i,e_j}\text{Pr}(K_i,K_j,e_i,e_j|C_i,C_j,t_i,t_j,R_{ij},p) \\
+&= \sum_{e_i,e_j} \underbrace{\text{Pr}(e_i,e_j|C_i,C_j,t_i,t_j,R_{ij},p)}_\text{(IV)} \cdot \underbrace{\text{Pr}(K_i,K_j|e_i,e_j,C_i,C_j,t_i,t_j,R_{ij},p)}_\text{(V)} \label{eq:ugly2}
+\end{align}
+
+Similarly as before, we need the following independence assumptions to simplify (IV) and (V),
+\begin{enumerate}
+\item $\text{Pr}(e_i,e_j|C_i,C_j,t_i,t_j,R_{ij},p) = \text{Pr}(e_j,e_j|t_i,t_j,p)$, i.e, the category keywords $C_i,C_j$, and the relation keywords $R_{ij}$ do not convey any extra information when the types $t_i,t_j$, and the predicate $p$ is known.
+
+\item $\text{Pr}(K_i,K_j|e_i,e_j,C_i,C_j,t_i,t_j,R_{ij},p) = \text{Pr}(K_i,K_j|e_i,e_j)$, i.e., the selector keywords $K_i,K_j$ are independent of category keywords $C_i,C_j$, the types $t_i,t_j$, the relation keywords $R_{ij}$, and the predicate $p$, once the actual entities $e_i,e_j$ are known.
+
+\item $\text{Pr}(K_i,K_j|e_i,e_j) = \text{Pr}(K_i|e_i)\cdot \text{Pr}(K_j|e_j)$, i.e., $K_i$ and $K_j$ are independent of each other and of any entities other than $e_i$ and $e_j$, respectively.
+\end{enumerate}
+
+Therefore, (\ref{eq:ugly2}) reduces to $\sum_{e_i,e_j} \text{Pr}(e_i,e_j|t_i,t_j,p) \cdot \text{Pr}(K_i|e_i) \cdot \text{Pr}(K_j|e_j)$ and (\ref{eq:main2}) now becomes:
+
+\begin{align}
+\text{Pr}(p|\vec{q})& \propto \text{Pr}(p) \cdot \sum_{t_i,t_j,e_i,e_j} \phi_2(p, R_{ij}, C_i, C_j, K_i, K_j, t_i, t_j, e_i, e_j) \label{eq:main3}
+\end{align}
+where $\phi_2$ is defined as,
+\begin{align}
+\phi_2 = \text{Pr}(R_{ij}|p) \cdot \text{Pr}(t_i,t_j|p) \cdot \text{Pr}(C_i|t_i) \cdot \text{Pr}(C_j|t_j) \cdot \text{Pr}(e_i,e_j|t_i,t_j,p) \cdot \text{Pr}(K_i|e_i) \cdot \text{Pr}(K_j|e_j) \label{eq:phi2}
+\end{align}
+Arguments of function $\phi_1$ are omitted in Equation \ref{eq:phi1} for the lack of horizontal space.
+
+We now proceed to describe how the above quantities will be estimated.
+
+\subsubsection{Estimating $\text{Pr}(p)$}
+$\text{Pr}(p)$ is simply the prior on the predicate $p$. We estimate it as:
+$$\text{Pr}(p) \approx \frac{\text{freq}(p)}{\sum_{p_i \in \mathbb{P}}\text{freq}(p_i)}$$
+where $\mathbb{P}$ is the set of all possible predicates. 
+
+\subsubsection{Estimating $\text{Pr}(R_{ij}|p)$, $\text{Pr}(C_i|t_i)$, and $\text{Pr}(K_i|e_i)$}
+
+\subsubsection{Estimating $\text{Pr}(t_i,t_j|p)$}
+
+\subsubsection{Estimating $\text{Pr}(e_i,e_j|t_i,t_j,p)$}
+
+\subsection{Entity Selection}
+Similar to our above approach towards Predicate Selection, we use a generative language model to narrow down candidate entities for the Entity Selection stage.
+
+Let $e_i$ denote a candidate entity entity (unknown) for the entity variable $x_i$ and let $\vec{q_{e_i}} = (K_i, C_i)$ be the part of the query pertaining directly to $x_i$. As before, we are interested in $\argmax_{e} \text{Pr}(e|\vec{q_{e_i}})$, where
+\begin{align}
+\text{Pr}(e|\vec{q_{e_i}}) \propto \text{Pr}(e, \vec{q_{e_i}}) & = \text{Pr}(e) \cdot \text{Pr}(\vec{q_{e_i}}|e) \\
+\label{eq:ent1}  &= \text{Pr}(e) \cdot \sum_{p_{ij_1}, p_{ij_2},..., p_{ij_r}}\text{Pr}(\vec{q_{e_i}}, p_{ij_1}, p_{ij_2},..., p_{ij_r} | e) \\
+ &= \text{Pr}(e) \cdot \sum_{p_{ij_1}, p_{ij_2},..., p_{ij_r}}\text{Pr}(K_i, C_i, p_{ij_1}, p_{ij_2},..., p_{ij_r} | e) \\
+  &= \text{Pr}(e) \cdot \sum_{p_{ij_1}, p_{ij_2},..., p_{ij_r}} \text{Pr}(K_i | e) \cdot \underbrace{\text{Pr}(C_i | K_i, e)}_\text{(VI)} \cdot \underbrace{\text{Pr}(p_{ij_1}, p_{ij_2},..., p_{ij_r} | C_i, K_i, e)}_\text{(VII)}
+\end{align}
+
+The summation of (\ref{eq:ent1}) is obtained by the introduction of latent variables $p_{ij_1}, p_{ij_2},..., p_{ij_r}$, that denote the various predicates that relate $x_i$ to any other $x_j (i \neq j)$ in the query. Note that we arrive at the entity selection stage only after one or more stages of predicate selection. Thus, the variables $p_{ij_1}, p_{ij_2},..., p_{ij_r}$ range over $\mathbb{P}_{ij_1}, \mathbb{P}_{ij_2}, ...,\mathbb{P}_{ij_r}$ respectively, where $\mathbb{P}_{ij_k} (1 \le k \le r)$ denote the set of selected candidate predicates in previous predicate selection stage(s). $\mathbb{P}_{ij_k} = \emptyset$, in case predicate selection stage has not occurred for $p_{ij_k}$, yet.
+
+As previously, we make several reasonable independence assumptions to simplify (VI) and (VII),
+\begin{enumerate}
+\item $\text{Pr}(C_i|K_i,e) = \text{Pr}(C_i|e)$, i.e., given the entity $e$, the category keywords $C_i$ are independent of the selector keywords $K_i$.
+
+\item $\text{Pr}(p_{ij_1}, p_{ij_2},..., p_{ij_r} | C_i, K_i, e) = \prod_{k=1}^{r} \text{Pr}(p_{ij_k} | e)$, i.e., the predicates are independent of each other and $C_i, K_i$, once the entity $e$ is known.
+\end{enumerate}
+

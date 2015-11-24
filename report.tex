@@ -4,14 +4,22 @@
   outer=20mm,
 %  textwidth=345pt,
   top=24mm,
-  bottom=22mm
+  bottom=28mm
 ]{geometry}
+
+
 
 %\usepackage[top=15mm, bottom=22mm]{geometry}
 \usepackage{fancyhdr}
+\usepackage{fancyvrb}				
 \usepackage{framed, color}
 \usepackage{graphicx}
 \usepackage{url}
+\usepackage{natbib}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+
 
 \pagestyle{fancy}
 
@@ -55,6 +63,7 @@
 
 \makeatother
 
+\DeclareMathOperator*{\argmax}{arg\!\max}
 
   
   
@@ -90,11 +99,15 @@
 
 \maketitle
 
+\linespread{1.2}
+
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.5em}
+
 
 %%%% Dedications page %%%%
 \begin{dedication}
-To my parents, for their endless support \\
- without ever having to ask me what I exactly do.
+To my parents,\\ who taught me the meaning of hardwork.
 \end{dedication}
 %%%% End dedications page %%%%
 
@@ -103,7 +116,7 @@ To my parents, for their endless support \\
 \renewcommand{\abstractname}{Acknowledgements}
 
 \begin{abstract}
-  I must acknowledge a great debt to my advisor, Professor S. Sudarshan, for his constant advice has been the guiding force throughout and without which, this work would never have been possible. 
+  I must acknowledge a great debt to my advisor, Professor S. Sudarshan, for his constant advice has been the guiding force throughout and without which, this work would never have been possible. I must also use this opportunity to thank him for all his forbearance and wise professional counsel multiple times in the last few months. I cannot imagine choosing a better advisor than Professor Sudarshan.
   \\ \\
 Pratyaksh Sharma
 \end{abstract}
@@ -138,10 +151,7 @@ Pratyaksh Sharma
 
 
 
-
-\begin{thebibliography}{9}
-
-\end{thebibliography}
+\bibliography{report}
 
 \end{document}
 
