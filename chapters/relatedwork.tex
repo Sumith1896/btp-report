@@ -1,72 +1,103 @@
-\chapter{Related Work}
+\chapter[Survey]{Survey of Existing Work}
 
+This chapter aims to give an overview of the existing work that tackles the problem of querying structured knowledge bases. As we discussed in Chapter 1, the use of structured query languages (e.g. SPARQL) is limited by requirement that the user must be aware of schema of the queried data. We will see in this chapter multiple approaches that seek to remedy that. A full coverage and critique of all approaches is beyond the scope of this report, so we shall select a few interesting ones for the purpose of this chapter. The approaches will be organized by their central ideas.
 
-\section{SPARQL approach}
-DEANNA [28] allows users to input questions in natural language and generates queries over a knowledge base that return answers. It then translates these questions into a structured SPARQL query that can be evaluated over knowledge bases such as Yago, Dbpedia, Freebase, or other Linked Data sources. 
+\section[Keyword Queries]{Free-Keyword Querying}
+ 
+ In \cite{elbassuoni2011keyword}, the authors develop a retrieval model that enables users to search RDF graphs using keywords. In contrast to approaches that retrieve entity tuples, the model here returns a ranked list of RDF \emph{subgraphs}. Retrieving subgraphs allows the treatment of triples in a holistic manner by explicitly taking into account the relationships between entities.
+ 
+ To process keyword queries over RDF graphs, the system associates each triple $t_i$ with a set of keywords derived from the subject and object of the triple, as well as representative keywords for the predicate and constructs a document $D_i$. The terms in the document $D_i$ are stemmed using any standard stemmer and then stored in an inverted index. In addition, the term frequency of term $w$ in $D_i$, referred to as $c(w, D_i)$, is also stored.
+ 
+ The first step towards query processing is to retrieve a set of subgraphs that match the user keyword query. To avoid retrieving large and noisy subgraphs, the following constraints are imposed: 1) the subgraphs should be unique and maximal (no subgraph should be a subset of any other subgraph retrieved), and 2) the subgraphs should contain triples matching different sets of keywords (no triples in the same subgraph should match the exact same set of keywords). The rationale behind the latter constraint is that if two triples match the same set of keywords, they are parts of two different possible results to the user query, and should be considered as parts of two separate subgraphs.
+ 
+ Let the keyword query be $q = \{q_1, q_2, ..., q_m\}$, the subgraph-retrieval algorithm utilizes the inverted index to retrieve lists $\{L_1, L_2, ..., L_m\}$. The set $E$ of all unique triples in all lists can be viewed as a disconnected graph\footnote{each triple can be viewed as an edge where its subject  and object are nodes} and is referred to as the query graph. An adaptation of the network-motif detection algorithm \cite{wernicke2005faster} is used on $E$ to retrieve the desired subgraphs. We omit the discussion here.
+ 
+ On retrieving a set of subgraphs matching a given keyword query, the next step is to rank these subgraphs. The ranking model is based on statistical language model techniques \cite{ponte1998language}. Given a subgraph $G = \{t_1, t_2, ..., t_n\}$, where $t_i$ is a triple, and the query $q = \{q_1, q_2, ..., q_m\}$ where $q_i$ is a single term, the subgraph G  is ranked based on the probability of generating the query Q given the subgraph $G$'s language model. Independence is assumed between the query terms, and likelihood $\text{Pr}(q|G)$ is computed as:
+ $$ \text{Pr}(q|G) = \prod_{i=1}^{m} \text{Pr}(q_i|G)$$
+ where $\text{Pr}(q_i|G)$ denotes the probability of term $q_i$ in the language model of $G$. The language model of subgraph $G$ is computed as a mixture model of the language models of its constituent triples, 
+ 
+ $$ \text{Pr}(q_i|G) = \frac{1}{n} \sum_{j=1}^{n} \text{Pr}(q_i|t_j)$$
+
+ where $\text{Pr}(q_i | t_j)$ is computed from the document $D_j$ constructed earlier.
+ 
+ The performance of the above model is compared with well-known techniques for keyword search over structured data \cite{bhalotia2002keyword, nie2007web} and we refer the interested reader to the original paper \cite{elbassuoni2011keyword} for that.
+ 
+ 
+\section{Converting queries to SPARQL}
+
+DEANNA \cite{yahya2012deep} is a framework for natural language question answering over structured knowledge bases. The approach followed by DEANNA is to convert the natural language question to an appropriate SPARQL query that can be then processed over the knowledge base. By far, the main challenge addressed is that of disambiguating user intent expressed in the verbal phrases and noun phrases in the question, and doing this in a globally coherent manner.
+
+As a first step, phrases are detected in the natural language question that potentially correspond to semantic items. This phrase detector unit uses multiple detectors, each of which can detect a certain class of phrases, corresponding to semantic classes, entities, relations and interrogative pronouns. The detectors utilize different named entity recognition and relation detection techniques.
+
+Next, the system attempts to detect \emph{triploids} in the natural language question. A triploid are 3-tuple of tokens which corresponds to a relation and its two arguments. These triploids and the candidate phrases from the previous step are are consolidated into \emph{q-units}, which are phrase-level triples (can possibly have multiple candidates for a relation and arguments).
+
+\begin{figure}
+  \center
+  \includegraphics[scale=0.5]{./deanna1.png}
+  \label{fig:disgraph}
+  \caption{Disambiguation graph. Attribution: \cite{yahya2012deep}}
+\end{figure}
+
+The next (and probably the most interesting) step is to perform disambiguation to resolve the mappings of phrases to semantic items. This is done in a joint manner---a weighted disambiguation graph is constructed and a dense subgraph is sought. A disambiguation graph (Figure \ref{fig:disgraph}) is a 3-partite graph with weighted edges. The edge weights are given as a combination of semantic coherence and syntactic similarity. Q-nodes collect triples of phrases together and this can been seen as dotted edges in Figure \ref{fig:disgraph}. 
+
+The problem of disambiguation now translates to finding a dense subgraph in the disambiguation graph. The density measure is a function of edge weights (which measure syntactic similarity and semantic coherence). Further constraints are put on the subgraph such that it represents a valid triple. The objective and the constraints are encoded as an integer linear program and fed into an ILP solver---which then returns the required subgraph.
+
+Once the disambiguation is completed, semantic grouping is performed which forms semantic triples. For example, if it is determined that the relation \texttt{marriedTo} connects the person referred to by `Who' and the \texttt{writer} to form the semantic triple \texttt{person marriedTo writer}. These semantic triples are transformed into SPARQL queries using a rule based method. For example, \texttt{person marriedTo writer} is transformed to \texttt{?x type person}, \texttt{?x marriedTo ?w}, \texttt{?w type writer}.
+
+%---------------GQBE Start----------------------------
 
 \section{Querying by example entity tuples}
- GQBE [29] proposes to query knowledge graphs by example entity tuples, where the users do not have to construct any query graph. 
+
+
+ GQBE \cite{jayaram2013querying} proposes to query knowledge graphs by example entity tuples. The user input and output of GQBE are both entity tuples,
+called query tuples and answer tuples, respectively. Plainly stated, given a data graph $G$ and a query tuple $t$, GQBE tries to find the top-$k$ answer tuples $t'$ with the highest similarity scores $\text{score}_t(t')$.
  
- GQBE is a system that queries entity-relationship graph by example entity tuples. GQBE automatically creates a maximal query graph based on the input example query tuple and finds the top-K matching answer tuples. GBQE uses the notion of neighborhood graph and maximal query graph.
  
-Given an entity-relationship graph G and a query tuple t, the corresponding
-neighborhood graph H\textsubscript{t} is the weekly connected sub graph of G that consists of all undirected paths in G of length d or smaller, with at least one end point each such path being a query entity in t. The path length threshold d is an input parameter.
-
-Even after removal of unimportant edges the reduced neighborhood graph Ht
- can be
-quite large even under a small path length threshold d. The query evaluation cost can be very
-high in finding approximate answers to such a large H\textsubscript{t}
-. Hence we aim to drastically reduce the
-size of H\textsubscript{t}
- and obtain a small subgraph that capture only important features of the input entities.
-This graph is termed as maximal query graph G\textsubscript{t}
-.
-To obtain maximal query graph, edges in the reduced neighborhood graph weighted by
-following measures.
-Participation degree p(e) of an edge e =(u, v) define as number of edges
-in data graph which share the same edge label and at least one of the two end nodes of edge e.
-
-For edge e, Inverse Edge Label Frequency is defined as,
-
-\begin{align}
-ief(e) = \frac{ log | E(G) | }{ \#label(e)}
-\end{align}
-
-
-Where $|$E(G)$|$ is the number of edges in data graph G and \#label(e) is the number of edges in G with the same label as e.
-
-So, given a input query tuple t, its reduced neighborhood graph H\textsubscript{t}
-, and a parameter m, the
-maximal query graph Gt
- is a weekly connected subgraph of Ht
- that maximize total edge weight
-and it has m edges. Here weight of edge e define as,
-
-\begin{align}
-w(e) = \frac{ief (e)}{p(e) \times d^2(e)}
-\end{align}
-
-
-Here d(e) is smallest distance of edge e from any input entity. 
-
+ $\text{score}_t(t')$ is computed by matching the inter-entity relationships of $t$ and that of $t'$. Matching is not done on an entity-level in $t$, rather, a neighborhood graph is constructed (captures `features' that might be of interest to users) from $t$ and $\text{score}_t(t')$ entails matching two
+ graphs constructed from $t$ and $t'$ respectively.
  
-\section{Interactive queries using user input}
- FreeQ [32] offers an interactive query interface over Freebase that enables a naive user to start with simple keywords and incrementally refine them into a structured query that can accurately express the user’s informational need. \\
+ The neighborhood graph $H_t$ of an example tuple $t$ is a weakly connected undirected subgraph of $G$ (the data graph) consisting of all nodes reachable from nodes of $t$ by an undirected path of length less than a user defined threshold $d$.
  
-The conceptual process of incremental query construction can be modeled as follows:
-\begin{itemize}
-\item 
-Given a database whose schema is G = (V,E), a user
-issues a keyword query K = {k1, k2, ..., kn}. 
-\item The system generates all possible query interpretations of K based on G. We call this set of query interpretations the interpretation space of K, denoted by ζ. 
-\item The system generates an interaction option IO and presents it to the user. 
-\item If the user accepts IO, then the system removes all the query interpretations that cannot imply IO from ζ. Otherwise, the system removes all the interpretations that imply IO from ζ.
-\item The system retrieves the top-k query interpretations
-from ζ, and presents them to the user. 
-\item If the user finds the intended query interpretation from the top-k, the query construction process terminates. Otherwise, the process generates another interaction option IO and
-presents it to the user.
-\end{itemize} 
+ It is observed that $H_t$ can be enormously large even for small values of $d$ (800K nodes for $d = 2$ in case of Freebase). Therefore, GQBE constructs a Maximum Query Graph (MQG) from $H_t$ which is expected to be drastically smaller than $H_t$ and yet capturing important features of the query tuple. $MQG_t$, given
+ a parameter $m$, is a weakly connected subgraph of the  neighborhood graph $H_t$ that maximizes total edge weight
+ $\sum_e w(e)$ while satisfying the constraints that it contains all the nodes in $t$, and contains at most $m$ edges.
+ 
+ The decision version of finding $MQG_t$ for a given $m$ is shown to be NP-hard, and therefore GQBE employs a greedy algorithm to get an approximate $MQG_t$.
+ 
+ Given a $MQG_t$, the goal is to find answer graphs $A$ which have high similarity to $MQG_t$. An answer graph $A$ to a query graph $Q$ is a
+ weakly connected subgraph of $G$ that is edge-isomorphic to $Q$. Similarity is defined as a composite of a content-score and a structure-score. Structure-score captures measures the important structure in $MQG_t$ that is captured by $Q$. Content-score is defined by giving extra credit for identical nodes among the matching nodes in answer graph $A$ and query graph $Q$.
+ 
+ Finally, GQBE searches $G$ for the top-$k$ answer subgraphs (according to the similarity score) in a best-first manner. We omit the algorithm in this discussion. 
+ 
+ \section{Interactive Queries}
+ 
+ Next, we cover FreeQ \cite{demidova2012freeq} - an interactive interface for incremental query construction. It enables a user to start with simple keywords and incrementally refine them into a structured query that captures the user's information need. Figure \ref{fig:freeq} illustrates the FreeQ user interface.
 
+ \begin{figure}[h!]
+ %\centering
+ \includegraphics[scale=0.45]{freeq.png}
+ \caption{FreeQ GUI. The components of the FreeQ
+GUI include: (1) an input field for keyword query,
+(2) interaction options, (3) top-k structured queries,
+and (4) query results. Attribution: \cite{demidova2012freeq}}
+ \label{fig:freeq}
+ \end{figure}
+ 
+ When a user issues a keyword query, say \texttt{"Tom Hanks Terminal"}, FreeQ tries to guess the user intent and displays the top-$k$ most likely structured queries in the query window. The user can then click on any of these if it satisfies their information need. 
+ 
+ In the common case, the right structured query will not the identified immediately. The user can then use various interaction options (in the interaction panel) that further clarify intent. These interaction options are simple questions, for example \emph{"Is Tom Hanks a person?"}, and \emph{"Is Terminal an entity in the film domain?"}. Each interaction refines the list of available structured queries to those that comply with the user's selection. 
+ 
+ Conceptually, the main idea is as follows: given a keyword query $K$, the system generates all possible query interpretations of $K$ based on data graph $G$. The set of query interpretations is called the interpretation space of $K$, denoted by $\zeta$. The system also generates a set of interaction options $IO$. If the user selects any interaction option $IO$, the interpretation space $\zeta$ is reduced and further the system displays the top-$k$ interpretations from $\zeta$. The process terminates when the user finds the intended structured query, otherwise it continues generating further interaction options.
+ 
+ It is essential to select the interaction options that can reveal as much information about the user’s intent as possible, i.e., the interaction options with the highest \emph{information gain} need to be identified. FreeQ utilizes the hierarchical conceptual models on top of the database schema to generate interaction options that yield high information gain.
+ 
+ FreeQ extends the Freebase schema with the domain hierarchy of Freebase. Also, FreeQ provides some other types of general interaction options based on hierarchical ontologies. To this end, FreeQ makes use of some external ontologies, such as WordNet \cite{miller1995wordnet} and YAGO \cite{suchanek2007yago}.
+ 
+ The generation of interpretation space is required before top-$k$ interpretations can be obtained. A naive materialization is infeasible for knowledge bases as large as Freebase. FreeQ  uses a query hierarchy introduced in \cite{demidova2012probabilistic}. The hierarchy is grown incrementally during the user interaction phase and generates only the most probable query construction options that comply with the user's selection in each step.
+ 
+ 
+ 
+\begin{comment}
 \section{Query interpretation based on history}
 Fu and Anyanwu [33] propose a context-aware approach for keyword query interpretation that personalizes the interpretation process based on a user’s query context.
 
@@ -110,7 +141,7 @@ hif(t) = \frac{1}{b^{T-t}}
 \end{align}
 where b $>$ 1 is also a positive integer constant.
 
-
+ 
 \section{Alternate query languages}
 Pound et al. [30] approach the keyword disambiguation problem by ranking different possible rewritings of a query based on their syntactic relationship to the keywords in the query as well as their semantic coherence in the underlying knowledge base. 
 
@@ -191,7 +222,7 @@ otherwise gracefully back o to broader types.
 ----------------------------
 36
 We  present  a  new  architecture  for  structural  interpretation of a telegraphic query into these segments:
-•
+
 Mention/s
 \^{e\textsubscript{1}}
 of an entity
@@ -470,3 +501,4 @@ query
 properties and inter-relationships.
 
 
+\end{comment}

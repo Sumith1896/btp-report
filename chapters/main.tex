@@ -1,7 +1,6 @@
 \chapter[ER Keyword Querying]{Entity Relationship Keyword Queries}
 
-% TODO complete outline
-In this chapter, we present a detail discussion of our approach towards supporting keyword queries and the techniques used. 
+In this chapter, we present a detail discussion of our approach towards supporting keyword queries. Earlier part of the chapter introduces the query model illustrated with examples. A brief overview of the query processing mechanism follows. The latter half of the chapter focuses on query interpretation---a theme central to our approach. Finally, the discussion is closed with the description of how the result set of the query is produced.
 
 \section{Query Model}
 
@@ -27,17 +26,17 @@ The query of Figure \ref{fig:erq} seeks the entity pairs \texttt{(x, y)} such th
 To make our discussion convenient, we formalize the notion of ERQ as follows. Our system expects the user to specify:
 
 \begin{itemize}
-\item The number of entities ($n$) desired in a result. The entity variables will be referred to as $x_1, x_2, ..., x_n$.
+\item The number of entities ($n$) desired in a result. The entity variables will be referred to as $e_1, e_2, ..., e_n$.
 \item A list of category keywords $C_i$ for each entity variable $x_i$.
 \item A list of \emph{selector keywords} $K_i$ for each entity variable $x_i$.
 \item A list of relation keywords $R_{ij}$ describing the relationship between entities $x_i$ and $x_j$ for all $i \neq j$.
 \end{itemize}
 
-The result of the query shall be one or more $n$-tuples, where $n$ is as specified in the query. In particular, the elements of the tuple bind to entity variables $(x_1, x_2, ..., x_n)$.
+The result of the query shall be one or more $n$-tuples, where $n$ is as specified in the query. In particular, the elements of the tuple bind to entity variables $(e_1, e_2, ..., e_n)$.
 
 The category keywords are used to specify what category or type the corresponding entity falls in. Selector keywords desire that the corresponding entity be \emph{associated} with these words. Relation keywords specify the relation predicates, in the same manner as ERQ. It is worth noting that each of $C_i$, $K_i$, and $R_{ij}$ may be left empty (unspecified) by the user. The user is also not expected to specify these query keywords in conformity with the schema of the queried RDF graph.
 
-We now illustrate another example to ease understanding of our ERQ formalism. Suppose we want to find the parent-child pairs of US presidents who have attended the same university. Such a query is demanding three entities $x_1$, $x_2$, and $x_3$---$x_1, x_2$ are the presidents, and $x_3$ their common alma mater. A user may formulate the query in the following manner:
+We now illustrate another example to ease understanding of our ERQ formalism. Suppose we want to find the parent-child pairs of US presidents who have attended the same university. Such a query is demanding three entities $e_1$, $e_2$, and $e_3$---$e_1, e_2$ are the presidents, and $e_3$ their common alma mater. A user may formulate the query in the following manner:
 
 \begin{itemize}
 \item Number of entities is 3.
@@ -47,6 +46,12 @@ We now illustrate another example to ease understanding of our ERQ formalism. Su
 \end{itemize}
 
 As we observed in Chapter 3, the problem of segmenting a user keyword query into the keywords for type/categories of entities sought and those for describing relationship between these entities inherently limits the performance (in both precision and recall) of the querying system. The ER query model might seem like a convenient ignorance of such issues, and in many ways it is. Our stance is that ER queries do not expect the amount of user sophistication that SPARQL querying systems expect. It is a sweet compromise between SPARQL querying and free-keyword querying that allows us to focus on challenges beyond query segmentation. Further, we believe that our ideas in this work can be supplemented with a layer of query segmentation---enabling free-keyword querying. 
+
+\subsection{Query Graph}
+Any given ER query can be thought of as edge-labelled directed graph $G = (V, E)$, with the vertex set $V = \{e_1, e_2, ..., e_n\}$ and the 
+labelled edge edge set $E = \{(e_i \xrightarrow{R_{ij}} e_j) \; | \; \forall \; R_{ij} \in \text{query} \}$. Answering the query would then 
+mean finding subgraphs in the data that \emph{match} the query graph. In this direction, the ER keyword query model can be viewed as a 
+relaxed variant of SPARQL query\footnote{The ER keyword query model is still very basic in comparison to SPARQL---which supports operations like sorting and aggregation that we do not consider here. Extensions of the ER keyword query model to support aggregation are left as future work.}, in which keywords can be used in place of actual schema elements of the data. While we do not explicitly use the graph interpretation of the query, except when a \emph{join} is required to produce the final results, it is still an important aid in visualizing the overall query processing mechanism.
 
 \section{Query Processing}
 
@@ -73,8 +78,6 @@ The RDF graph is queried to find all entities $x_i$ and $x_j$ that match the tri
 At this step, the user is expected to select a subset of these entities that align with her intent. As in the case of predicate selection, it is to be ensured that a small enough, yet accurate set of candidate entities is presented to the user. The entity selection step for entity variables $x_i$ and $x_j$ is performed after the predicate selection step for $p_{ij}$.
 
 Once the user agrees on a set of candidate entities $\tilde{X_i}$ for entity variable $x_i$, this information will be used to reduce the complexity of the further entity selection stages. This process terminates when predicate selection and entity selection has been performed for each predicate and entity in the query. The entity-relation graphs are finally ranked and returned to the user as query results.
-
-\subsection{An Example}
 
 
 \section{Query Interpretation}
@@ -158,8 +161,7 @@ where $\mathbb{P}$ is the set of all possible predicates in our RDF data source.
 
 \subsubsection{Estimating $\psi(R_{ij}, p)$, $\psi(C_i, t_i)$, and $\psi(K_i, e_i)$}
 The  potentials $\psi(R_{ij}, p)$, $\psi(C_i, t_i)$, and $\psi(K_i, e_i)$ are similar in the sense that they all capture the agreement between two variables: one of them being keywords supplied in the user query and the other being a predicate, type, or an entity in the structured data source. 
-For example, if the the relation keywords $R_{ij}$ are \texttt{"death reason"} and the related entity sought is of type \texttt{person}, then $R_{ij}$ should match to the 
-predicate \texttt{/people/} \texttt{deceased\_person/} \texttt{cause\_of\_death} rather than the predicate \texttt{/people/} \texttt{deceased\_person/} \texttt{place\_of\_death}.
+For example, if the the relation keywords $R_{ij}$ are \texttt{"death reason"} and the related entity sought is of type \texttt{person}, then $R_{ij}$ should match to the predicate \texttt{/people/} \texttt{deceased\_person/} \texttt{cause\_of\_death} rather than the predicate \texttt{/people/} \texttt{deceased\_person/} \texttt{place\_of\_death}.
 
 There may exist considerable variation in how keywords are represented in a query. The relation language model needs to build a bridge between the formal $p$ and the textual $R_{ij}$, so that (un)likely $p$'s have (small) large potential. Plenty of approaches \cite{berant2013semantic, berant2014semantic, kwiatkowski2013scaling, yih2014semantic} to this problem have been studied recently. We choose a pattern-based approach akin to PATTY \cite{nakashole2012patty} for its simplicity and scalability to large amounts of data.
 
@@ -194,7 +196,8 @@ Define,
 where $n(e_i, e_j; p) = 1$ if the triple $\langle e_i, p, e_j \rangle$ occurs in the data, otherwise $n(e_i, e_j; p) = 0$. As earlier, $n(p)$ denotes the number of triples that have $p$ as their predicate part.
 
 \subsubsection{Computation}
-Now that we have defined the quantities involved in Equation \ref{eq:main3}, we can compute the summation involved on the right hand side. Note that only $\psi(e_i, e_j | t_i, t_j, p)$ involves all the summation variables $t_i, t_i, e_i, e_i$ and can be expensive to compute. The summation on the other terms can be computed rather cheaply. 
+Now that we have defined the quantities involved in Equation \ref{eq:main3}, we can compute the summation involved on the right hand side. Note that only $\psi(e_i, e_j | t_i, t_j, p)$ involves all the summation variables $t_i, t_i, e_i, e_i$ and can be expensive to compute. The summation on the other terms can be computed rather cheaply.
+
 \begin{comment}
 Looking back at our definition of $\psi(e_i, e_j | t_i, t_j, p)$ in Equation \ref{eq:psi4}, 
 
@@ -214,7 +217,7 @@ Also, the argmax computation that we started off initially with can be replaced 
 \subsection{Entity Selection}
 Similar to our above approach towards Predicate Selection, we use a generative language model to narrow down candidate entities for the Entity Selection stage.
 
-Let $e_i$ denote a candidate entity entity (unknown) for the entity variable $x_i$ and let $\vec{q_{e_i}} = (K_i, C_i)$ be the part of the query pertaining directly to $x_i$. As before, we are interested in $\argmax_{e} \text{Pr}(e|\vec{q_{e_i}})$, where
+Let $e_i$ denote a candidate entity (unknown) for the entity variable $x_i$ and let $\vec{q_{e_i}} = (K_i, C_i)$ be the part of the query pertaining directly to $x_i$. As before, we are interested in $\argmax_{e} \text{Pr}(e|\vec{q_{e_i}})$, where
 \begin{align}
 \text{Pr}(e|\vec{q_{e_i}}) \propto \text{Pr}(e, \vec{q_{e_i}}) & = \text{Pr}(e) \cdot \text{Pr}(\vec{q_{e_i}}|e)  \\
 \label{eq:ent1}  &= \text{Pr}(e) \cdot \sum_{p_{ij_1}, p_{ij_2},..., p_{ij_r}}\text{Pr}(\vec{q_{e_i}}, p_{ij_1}, p_{ij_2},..., p_{ij_r} | e) \\
@@ -246,8 +249,6 @@ where $\mathbb{E}$ is the set of entities considered for ranking.
 \subsubsection{Estimating $\psi(K_i, e)$}
 An initial approach is to use WordNet synsets of the short description available for the entity $e$; and set $\psi(K_i, e)$ for any matching words in the synsets. With the availability of entity-annotated corpora and on-the-fly entity annotators \cite{ferragina2010tagme}, more sophisticated measures can be defined.
 
-
-
 \subsubsection{Estimating $\psi(C_i, e)$}
 A Freebase entity can in general, be associated with several types $t_1, ..., t_m$. We define, 
 \begin{align}
@@ -265,14 +266,15 @@ where $n(p_{ij_{k}}, e)$ is the number of triples that have $e$ related by the p
 \subsubsection{Computation}
 The summation in Equation \ref{eq:entmain3}, when rewritten in product-of-sum form, is not expected to be computationally expensive owing to the following observations: 
 \begin{enumerate}
-  \item The predicates $p_{ij_1}, p_{ij_r}, ..., p_{ij_r}$ are the predicates that concern the entity variable $e_i$ in the query. Therefore, for even the most convoluted (and meaningful) queries one can think of, $r$ would be a small number (< 10 let's say).
+  \item The predicates $p_{ij_1}, p_{ij_r}, ..., p_{ij_r}$ are the predicates that concern the entity variable $e_i$ in the query. Therefore, for even the most convoluted (and meaningful) queries one can think of, $r$ would be a small number ($< 10$ let's say).
   \item The predicate selection step would have been completed for these predicates before entity selection is done for the entity variable $e$. This limits the total number of terms in the sum, allowing for cheap computation of the overall \emph{score}.   
 \end{enumerate}
 
 Further success can be had by precomputing some of the quantities $\psi$. 
 
-The argmax computation can be done away with, and top-k ranking entities can be chosen as the candidates to be presented to the user. Even the score is not required to be computed for all entities and this step can be assisted by using a heuristic to filter a larger set of candidate entities; and then computing the ranking for these entities. An initial heuristic would be to perform a keyword search using the selector keywords (and their synonyms) of the entity and to perform ranking for the result entities. Keyword search can be supported by systems like Apache Solr \cite{smiley2015apache}
+The argmax computation can be done away with, and top-k ranking entities can be chosen as the candidates to be presented to the user. Even the score is not required to be computed for all entities and this step can be assisted by using a heuristic to filter a larger set of candidate entities; and then computing the ranking for these entities. An initial heuristic would be to perform a keyword search using the selector keywords (and their synonyms) of the entity and to perform ranking for the result entities. Keyword search can be supported by systems like Apache Solr \cite{smiley2015apache}.
 
 \section{Result of the query}
 
 At this stage, we have a set of selected entities for each entity variable sought by the query, and also a set of selected predicates for each of the relations between pairs entity variables in the query. We can further assume with some confidence that sizes of these set would not be too large. In such a situation, arriving at the result set is a matter of computing the join of selected entity sets corresponding  to adjacent entities in the query-graph. Further filtering may be required to discard (entity-predicate-entity) tuples that do not have matching triples in the data.
+

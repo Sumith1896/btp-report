@@ -1,7 +1,9 @@
 \documentclass[a4paper, twoside, 12pt]{report}
 \usepackage[
-  inner=30mm,
-  outer=20mm,
+%  inner=30mm,
+%  outer=20mm,
+   left=25mm,
+   right=23mm,
 %  textwidth=345pt,
   top=24mm,
   bottom=28mm
@@ -15,14 +17,26 @@
 \usepackage{framed, color}
 \usepackage{graphicx}
 \usepackage{url}
-\usepackage{natbib}
+%\usepackage[square]{natbib}
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{fixltx2e}
 \usepackage{comment}
+\usepackage{mathtools}
+\usepackage{sectsty}
+\usepackage{afterpage}
+%\usepackage{apalike}
 
+\newcommand\blankpage{%
+    \null
+    \thispagestyle{empty}%
+    \addtocounter{page}{-1}%
+    \newpage}
+    
 \pagestyle{fancy}
+\chapterfont{\centering}
+\linespread{1.2}
 
 \graphicspath{{./images/}}
 
@@ -49,7 +63,7 @@
   \pagenumbering{roman}}
 
 \newcommand\mainmatter{%
-    \cleardoublepage
+   % \clearpage
  % \@mainmattertrue
   \pagenumbering{arabic}}
 
@@ -69,61 +83,48 @@
   
   
 \title{\textbf{Entity Relationship Keyword Queries \\ on Knowledge Graph}}
-\author{
-		\bf{Undergraduate Thesis Report}\\
+\author{Undergraduate Thesis Report \\ \emph{submitted in partial fulfilment of requirements for the degree of}\\
         \\
-        \emph{Submitted in partial fulfilment of requirements for the degree of}\\
-        \\
-        \bf{Bachelor of Technology (Honours)}\\
+        {Bachelor of Technology (Honours)}\\
         \\
         \emph{by}\\
         \\
-		\bf{Pratyaksh Sharma}\\
-        \bf{Roll No : 120050019}\\
+		{Pratyaksh Sharma}\\
+        {Roll No : 120050019}\\
         \\
         \emph{under the guidance of}\\
         \\
-		\bf{Dr. S. Sudarshan}\\
+		{Dr. S. Sudarshan}\\
         \\\\
         \includegraphics[height=3.5cm]{iitb_logo.jpg}\\
         \\
-		\bf{Department of Computer Science and Engineering}\\
-        \bf{Indian Institute of Technology Bombay}\\
-        \bf{Mumbai 400076, India}\\
+		{Department of Computer Science and Engineering}\\
+        {Indian Institute of Technology Bombay}\\
+        {Mumbai 400076, India}\\
 }
 \date{November, 2015}
 
-\bibliographystyle{plain}
 
 \begin{document}
 \frontmatter
+\linespread{1}
 
 \maketitle
 
 
 %%%% Dedications page %%%%
+%\afterpage{\blankpage}
 \begin{dedication}
+%\afterpage{\blankpage}
 To my parents, for their endless support \\
 and for teaching me the value of hardwork and discipline.
 \end{dedication}
+
 %%%% End dedications page %%%%
 
-
-%%%% Begin acknowledgements page %%%%
-\renewcommand{\abstractname}{Acknowledgement}
-
-\begin{abstract}
- \addcontentsline{toc}{chapter}{Acknowledgement}
-
-  I must acknowledge a great debt to my advisor, Professor S. Sudarshan, for his constant advice has been the guiding force throughout and without which, this work would never have been possible. I also thank him for all his forbearance and wise professional counsel multiple times in the last few months. I cannot imagine having a better advisor than Professor Sudarshan.
-  \\ \\
-Pratyaksh Sharma
-\end{abstract}
-\newpage
-%%%% End acknowledgements page %%%%
-
-
 %%%% Begin abstract page %%%%
+
+
 \renewcommand{\abstractname}{Abstract}
 \begin{abstract}
  \addcontentsline{toc}{chapter}{Abstract}
@@ -133,11 +134,29 @@ Pratyaksh Sharma
 %%%% End abstract page %%%%
 
 
+
+\clearpage
+\thispagestyle{empty}
+\topskip0pt
+\vspace*{\fill}
+\vspace{-5cm}
+\begin{center}
+\addcontentsline{toc}{chapter}{Acknowledgement}
+\bf{Acknowledgement}
+\end{center}
+I must acknowledge a great debt to my advisor, Professor S. Sudarshan, for his constant advice has been the guiding force throughout and without which, this work would never have been possible. I also thank him for all his forbearance and wise professional counsel multiple times in the last few months. I cannot imagine having a better advisor than Professor Sudarshan.
+\\ \\
+Pratyaksh Sharma
+\vspace*{\fill}
+
+%%%% End acknowledgements page %%%%
+
+
 \tableofcontents
 
 \mainmatter
 
-\linespread{1.2}
+
 \setlength{\parindent}{2em}
 \setlength{\parskip}{0.5em}
 
@@ -156,6 +175,8 @@ Pratyaksh Sharma
 
 \input{./chapters/futurework.tex}
 
+\bibliographystyle{apalike}
+\addcontentsline{toc}{chapter}{Bibliography}
 \bibliography{report}
 
 \end{document}
