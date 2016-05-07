@@ -28,8 +28,8 @@
 
 \titlegraphic{\includegraphics[height=50pt]{iitb_logo.jpg}}
 
-\setbeamercovered{transparent} 
-%\setbeamertemplate{navigation symbols}{} 
+\setbeamercovered{transparent}
+%\setbeamertemplate{navigation symbols}{}
 %\logo{}
 \date{26 November 2015}
 %\institute{IIT Bombay}
@@ -102,21 +102,21 @@ Enable evaluation of complex keyword queries on large structured knowledge bases
 \begin{frame}{Freebase}
 \begin{itemize}
   \item \visible<1->{Freebase is a collaborative knowledge base, which organizes data in RDF triple format  \texttt{<subject> <predicate> <object>}}
-  
+
   \visible<2->{\item Subject is always a Freebase topic (equivalent to an entity)}
 
   \visible<3->{\item Object may be a Freebase topic or a literal value like string, booleans or numberic values}
- 
+
   \visible<4->{\item Predicate is always a Freebase property (equivalent to a relation)}
- 
+
   \visible<5->{\item Freebase property are grouped under Freebase types which are further grouped Freebase Domains}
-  
+
   \visible<6->{\item Freebase Property Id is of the form '/domain/type/property'}
-  
+
   \visible<7->{\item Multiple freebase properties may have same property names but they are used in different contexts
-  
+
   \begin{itemize}
-  
+
   \item Example: /music/artist/genre and /book/book/genre have same property
 name but grouped under separate domain and type
   \end{itemize}}
@@ -189,7 +189,7 @@ DEANNA translates keyword queries to SPARQL queries. It involves the following s
 
 \begin{frame}{Querying by example entity tuples}
 \begin{itemize}
-\item 
+\item
 Since the user doesn't know what the predictes are, querying by example tuples could be used to figure out the predicates.
 
 \item The user input and output of GQBE are both entity tuples,
@@ -207,22 +207,22 @@ called query tuples and answer tuples, respectively.
 \begin{frame}{Interactive queries using user input}
 The conceptual process of incremental query construction can be modeled as follows:
 \begin{itemize}
-\item 
+\item
 Given a database whose schema is G = (V,E), a user
-issues a keyword query K = $\{$k1, k2, ..., kn$\}$. 
-\item The system generates all possible query interpretations of K based on G. We call this set of query interpretations $\tau$. 
-\item The system generates an interaction option IO and presents it to the user. 
+issues a keyword query K = $\{$k1, k2, ..., kn$\}$.
+\item The system generates all possible query interpretations of K based on G. We call this set of query interpretations $\tau$.
+\item The system generates an interaction option IO and presents it to the user.
 \item If the user accepts IO, then the system removes all the query interpretations that cannot imply IO from $\tau$. Otherwise, the system removes all the interpretations that imply IO from $\tau$.
 \item The system retrieves the top-k query interpretations
-from $\tau$, and presents them to the user. 
+from $\tau$, and presents them to the user.
 \item If the user finds the intended query interpretation from the top-k, the query construction process terminates. Otherwise, the process generates another interaction option IO and
 presents it to the user.
-\end{itemize} 
+\end{itemize}
 \end{frame}
 
 \begin{frame}{Query interpretation based on history}
 \begin{itemize}
-\item 
+\item
 This approach uses previous queries to help during the disambiguation process. The effect that a previous query has is a combination of historical impact factor(hif) and relevance factor.
 
 \item hif for a query done at time t on a query done a time T is:
@@ -281,7 +281,7 @@ hif(t) = \frac{1}{b^{T-t}}
 \item<4-> Number of entities is 3.
 \item<5-> $C_1=$\{`person'\}, $C_2=$\{`person'\}, and $C_3=$\{`university'\}.
 \item<6-> $K_1=$\{`US', `President'\}, $K_2=$\{`US', 'President'\}, and $K_3=$\{\}.
-\item<7-> $R_{12}=$\{`parent'\}, $R_{13}=$\{`education'\}, and $R_{23}=$\{`education'\}, 
+\item<7-> $R_{12}=$\{`parent'\}, $R_{13}=$\{`education'\}, and $R_{23}=$\{`education'\},
 \end{itemize}
 
 \end{frame}
@@ -327,7 +327,7 @@ $V = \{e_1, e_2, ..., e_n\}$ and $E = \{(e_i \xrightarrow{R_{ij}} e_j) \; | \; \
 \visible<5->{Our approach: ask user for help!}
 
 \end{frame}
-  
+
 %-------------------------%
 
 \begin{frame}{Query Processing Overview}
@@ -456,7 +456,7 @@ $V = \{e_1, e_2, ..., e_n\}$ and $E = \{(e_i \xrightarrow{R_{ij}} e_j) \; | \; \
 
 \item<3-> $\text{Pr}(C_i,C_j|t_i,t_j,R_{ij},p) = \text{Pr}(C_i,C_j|t_i,t_j)$
 
-\item<4-> $\text{Pr}(C_i,C_j|t_i,t_j) = \text{Pr}(C_i|t_i) \cdot \text{Pr}(C_j|t_j)$ 
+\item<4-> $\text{Pr}(C_i,C_j|t_i,t_j) = \text{Pr}(C_i|t_i) \cdot \text{Pr}(C_j|t_j)$
 \end{enumerate}
 
 
@@ -631,7 +631,7 @@ $V = \{e_1, e_2, ..., e_n\}$ and $E = \{(e_i \xrightarrow{R_{ij}} e_j) \; | \; \
 \visible<3->{ &= \text{Pr}(e) \cdot \sum_{p_{ij_1}, p_{ij_2},..., p_{ij_r}}\text{Pr}(\vec{q_{e_i}}, p_{ij_1}, p_{ij_2},..., p_{ij_r} | e)} \\
 \visible<4->{&= \text{Pr}(e) \cdot \sum_{p_{ij_1}, p_{ij_2},..., p_{ij_r}}\text{Pr}(K_i, C_i, p_{ij_1}, p_{ij_2},..., p_{ij_r} | e)}
 \end{align*}
- 
+
  \begin{align*}
 \visible<5->{  = \text{Pr}(e) \cdot \sum_{p_{ij_1}, p_{ij_2},..., p_{ij_r}} \text{Pr}(K_i | e) \cdot \text{Pr}(C_i | K_i, e) \cdot \text{Pr}(p_{ij_1}, p_{ij_2},..., p_{ij_r} | C_i, K_i, e) }
 \end{align*}
@@ -713,7 +713,7 @@ An initial approach is to use WordNet synsets of the short description available
 \visible<1->{The original equation, when rewritten in product-of-sum form, is not expected to be computationally expensive owing to the following observations: }
 \begin{enumerate}
   \item<2-> The predicates $p_{ij_1}, p_{ij_r}, ..., p_{ij_r}$ are the predicates that are labels of outgoing edges of entity variable $e_i$ in the query graph. Therefore, for even the most convoluted (and meaningful) queries one can think of, $r$ would be a small number ($< 10$ let's say).
-  \item<3-> The predicate selection step would have been completed for these predicates before entity selection is done for the entity variable $e$. This limits the total number of terms in the sum, allowing for cheap computation of the overall \emph{score}.   
+  \item<3-> The predicate selection step would have been completed for these predicates before entity selection is done for the entity variable $e$. This limits the total number of terms in the sum, allowing for cheap computation of the overall \emph{score}.
 \end{enumerate}
 
 
