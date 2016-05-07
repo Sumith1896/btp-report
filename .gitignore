@@ -23,3 +23,8 @@
 *.synctex.gz
 *.pdf
 
+*~
+*.swp
+*.swo
+*.fls
+*.fdb_latexmk
