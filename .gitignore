@@ -28,3 +28,6 @@
 *.swo
 *.fls
 *.fdb_latexmk
+*.nav
+*.snm
+

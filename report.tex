@@ -154,6 +154,7 @@ Pratyaksh Sharma
 
 
 \tableofcontents
+\raggedbottom
 
 \mainmatter
 
@@ -1108,11 +1109,11 @@ At this stage, we have a set of selected entities for each entity variable sough
 
 %%%%%%%%%% Chapter 5 %%%%%%%%%%%%%%
 
-\addtocontents{toc}{\protect\newpage}
+%\addtocontents{toc}{\protect\newpage}
 
 \chapter{Implementation}
 
-In the last chapter we introduced the Entity Relationship Keyword Querying model. In the present chapter, we shall describe the implementation of the same. Most of the ideas are uncomplicated, but as is often said, the devil is in the detail.
+In the last chapter we introduced the Entity Relationship Keyword Querying model. In the present chapter, we shall describe the implementation of the same. For many of the computations involved in query processing, there are several possible ways to carry them out. The following exposition shall discuss the relative merits and demerits of the possible approaches. Most of the ideas are uncomplicated, but as is often said, the devil is in the detail.
 
 \section{Predicate Selection}
 As we saw in section \ref{predsel}, one of the query processing steps is to produce a ranked list of candidate predicates for each set of relation keywords $R_{ij}$ in the query. We discussed in section \ref{predselint} the joint interpretation ranking approach which takes into account all parts of the query in a holistic manner in order to produce a ranking of candidate predicates for given relation keywords $R_{ij}$.
@@ -1142,9 +1143,9 @@ $$\psi(p) = \frac{\text{freq}(p)}{827,615,838}$$
 
 The various $\psi(p)$ values are collected to form the vector $\overrightarrow{\psi_{freq}}$.
 
-\begin{figure}[h] \label{preddist}
+\begin{figure}[h!] \label{preddist}
 \centering
-\includegraphics[width=0.85\textwidth]{./images/pred-freq}
+\includegraphics[width=0.8\textwidth]{./images/pred-freq}
 \caption{Frequency distribution of Freebase predicates. Note that the scale on Y-axis is logarithmic.}
 \end{figure}
 
@@ -1251,13 +1252,14 @@ To end this subsection, we present a sample of the top-$k$ results obtained usin
 \end{longtable}
 
 
-\textbf{Concluditng Remarks}: Even though the pattern-based approach utilizing ClueWeb09 corpus seems superior to the naive Lucene-based search technique, in practice we observed the latter to be much lighter on resources (and thus, faster) without compromising a lot on the accuracy of scores.
+\textbf{Concluding Remarks}: Even though the pattern-based approach utilizing ClueWeb09 corpus seems superior to the naive Lucene-based search technique, in practice we observed the latter to be much lighter on resources (and thus, faster) without compromising a lot on the accuracy of scores.
 
 \subsection{Computing $\psi(C_i, t_i)$}
 Similar to the $\psi(R_{ij},p)$ computation discussed in the previous section, the Lucene-based search and word embeddings approaches can be adapted to the $\psi(C_i, t_i)$ computation capturing the similarity between a bag of category keywords $C_i$ and a freebase type $t_i$.
 
 Again, due to easy access and support available for the CSAW codebase, we chose to go with a type language model discussed previously in \cite{joshiknowledge}.
 Estimating the target entity type, without over-generalizing or overspecifying it, has always been important for QA. E.g., when $C_i$ is `city', a good type language model should prefer $t_i$ as \url{/location/citytown} over \url{/location/location} while avoiding \url{/location/es_autonomous_city}.
+
 A catalog like Freebase suggests a straightforward method to collect a type language model. Each type is described by one or more phrases through the link \url{/common/topic/alias}. We
 can collect these into a micro-document and use a standard Dirichlet-smoothed language model from IR \cite{zhai2008statistical}. In Freebase, an entity node (e.g., Einstein, \url{/m/0jcx}) may be linked to a type node (e.g. \url{/base/scientist/physicist}) using an edge with label \url{/type/object/type}. But relation types provide additional clues to types of the endpoint entities. Freebase relation types have the form \url{/x/y/z}, where \url{x} is the domain of the relation, and \url{y} and \url{z} are string representations of the type of the entities participating in the relation. E.g., the (directed) relation
 type \url{/location/country/capital} connects from from \url{/location/country} to \url{/location/citytown}. Therefore, ``capital" can be added to the set of descriptive phrases of entity type \url{/location/citytown}.
@@ -1351,8 +1353,28 @@ The Lucene-based search approach is better suited for computing $\psi(K_i, e_i)$
 Furthermore, the word embeddings approach for estimating $\psi(K_i,e_i)$ is straightforward too since Google has made available\footnote{Google Code Archive - word2vec. URL: \url{code.google.com/archive/p/word2vec/}} pre-trained entity vectors with freebase naming. The word2vec `distance' function can be called to return the freebase entities with the least cosine distance from the keyword query $K_i$ and the cosine distance itself can be used in lieu of $\psi(K_i,e_i)$.
 
 \subsection{Computing $\psi(t_i, t_j, p)$}
+Recall that we defined, $$\psi(t_i, t_j, p) = \frac{n(p;t_i,t_j)}{n(p)}$$ where $n(p;t_i,t_j)$ denotes the number of triples in freebase that contain the predicate $p$ and whose subject and object have the freebase types $t_i$ and $t_j$ respectively. $n(p)$ as before, denotes the number of freebase triples containing $p$ as the predicate.
+
+To compute $n(p;t_i,t_j)$, we iterate over the freebase triples dump and create a new intermediate dump in which each of the subject and object are replaced by their respective freebase types. To speed up this replacement pass, we were required to maintain an in-memory dictionary mapping each freebase entity to its freebase type. In case the object part of the triple was not found to be a freebase url, we simply ignored the triple.
+
+Once the intermediate dump was produced, an external merge-sort of the dump was performed to cluster together the rows with same value of $(t_i,t_j,p)$. A final pass computed the quantity $n(p;t_i,t_j)$ by counting the number of adjacent rows with the same value of $(t_i, t_j,p)$.
+
+The final $n(p;t_i,t_j)$ values are stored in a PostgreSQL table, along with $n(p)$ values in another table. The two quantities are retrieved from PostgreSQL to compute $\psi(t_i,t_j,p)$ when required during query processing.
 
 \subsection{Overall score computation for predicate selection}
+Among the quantities in \ref{eq:phi2}, we have so far discussed the computation of $\psi(p)$, $\psi(R_{ij},p)$, $\psi(C_i,t_i)$, $\psi(K_i,e_i)$ and $\psi(t_i,t_j,p)$. Since the summation in equation \ref{eq:predsel1} is over all $t_i$, $t_j$, $e_i$, $e_j$ involved, it is likely that the exact computation will be infeasible within reasonable expectations of query processing time. We therefore, for our prototyping purposes, drop the summation over $e_i$, $e_j$ by simply setting $\psi(e_i,e_j,t_i,	t_j,p) = 1$, $\psi(K_i,e_i) = 1$, and $\psi(K_j,e_j)$.
+
+Our simplified scoring model for predicates is thus,
+\begin{align}
+\text{Score}(p|\vec{q}) \propto \psi(p) \cdot \psi(R_{ij},p) \cdot \sum_{t_i,t_j} \psi(C_i,t_i) \cdot \psi(C_j,t_j) \cdot \psi(t_i,t_j,p) \label{eq:predselfinal}
+\end{align}
+
+For our prototype implementation, we use Lucene scores as a proxy for $\psi(R_{ij}, p)$. An Apache Solr index is built on micro-documents (one for each freebase predicate) containing WordNet synsets of the freebase predicate name. In the first step, the relation keywords $R_{ij}$ are used to retrieve the top-100 freebase predicates along with their Lucene scores by querying the Solr index. Second, the language model for types is queried by $C_i$ and $C_j$ to return two list of candidate types (along with $\psi(C_i,t_i)$ scores) of the formal types $t_i$ and $t_j$.
+
+Once we have the list of candidate predicates and two lists for candidate types, and their respective scores, we probe each combination of $(t_i,t_j,p)$
+ and fetch $\psi(t_i,t_j,p)$ using a PostgreSQL query. The product $\psi(C_i,t_i) \cdot \psi(C_j,t_j) \cdot \psi(t_i,t_j,p)$ is finally marginalized by summing over all candidate types for $t_i$ and $t_j$.
+
+The list of predicate scores thus obtained is sorted, and the top-100 predicates are sent to the user for selection. The use may select one or more of these predicates, thereby concluding one predicate selection step.
 
 \section{Entity Selection}
 
