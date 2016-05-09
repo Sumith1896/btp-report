@@ -13,7 +13,7 @@
 
 %\usepackage[top=15mm, bottom=22mm]{geometry}
 \usepackage{fancyhdr}
-\usepackage{fancyvrb}
+\usepackage{fancyvrb}				
 \usepackage{framed, color}
 \usepackage{graphicx}
 \usepackage{url}
@@ -34,7 +34,7 @@
     \thispagestyle{empty}%
     \addtocounter{page}{-1}%
     \newpage}
-
+    
 \pagestyle{fancy}
 \chapterfont{\centering}
 \linespread{1.2}
@@ -46,7 +46,7 @@
 \newenvironment{dedication}
   {\clearpage           % we want a new page
    \thispagestyle{empty}% no header and footer
-   \vspace*{\stretch{1}}% some space at the top
+   \vspace*{\stretch{1}}% some space at the top 
    \itshape             % the text is in italics
    \center          % center of the page
   }
@@ -81,8 +81,8 @@
 
 \DeclareMathOperator*{\argmax}{arg\!\max}
 
-
-
+  
+  
 \title{\textbf{Entity Relationship Keyword Queries \\ on Knowledge Graph}}
 \author{Undergraduate Thesis Report \\ \emph{submitted in partial fulfilment of requirements for the degree of}\\
         \\
@@ -166,11 +166,11 @@ Pratyaksh Sharma
 \pagebreak
 
 
-%%%%%%%%%% Chapter 1 %%%%%%%%%%%%%%
+%%%%%%%%%% Chapter 1 %%%%%%%%%%%%%% 
 
 \chapter{Introduction}
 
-While the web is without doubt the largest collection of human knowledge, it is largely constituted of unstructured information  -- web pages with text, images and other media embedded within them. This organization (or the lack of) of information, poses certain difficulties and inherent limitations in building automated systems that can consume and process information.
+While the web is without doubt the largest collection of human knowledge, it is largely constituted of unstructured information  -- web pages with text, images and other media embedded within them. This organization (or the lack of) of information, poses certain difficulties and inherent limitations in building automated systems that can consume and process information. 
 
 To remedy some of the perceived challenges, there is an ongoing effort to build and maintain structured knowledge bases. As of today, there exist several of such knowledge repositories, for example: Freebase, DBpedia, Wikidata, etc. Apart from those freely accessible, several internet businesses like Google. Yahoo!, and Baidu maintain their own proprietary knowledge bases, which have been used successfully in assisting internet web search applications.
 
@@ -186,7 +186,7 @@ In this work, we shall survey a number of such keyword querying approaches on st
 
 As a prerequisite to begin our exposition, we provide  an overview of RDF/SPARQL specifications and related concepts in Chapter 2. In Chapter 3, we survey a few select works whose motivation is similar to ours. We highlight important ideas that can be incorporated in building future systems. Finally, Chapter 4 shall provide a detailed discussion of our proposed approach towards the problem. We conclude with the summary and directions for future work in Chapter 5.
 
-%%%%%%%%%% Chapter 2 %%%%%%%%%%%%%%
+%%%%%%%%%% Chapter 2 %%%%%%%%%%%%%% 
 
 \chapter{Background}
 
@@ -208,7 +208,7 @@ The fundamental building block of \emph{knowledge graph} (as we shall call it wh
 
 To put it simply, a structured knowledge base captures information about entities. Entities can be related to each other and can have properties (or attributes). The idea of expressing relations between entities is directly borrowed from the notion of Entity-Relationship Model.
 
-Resource Description Framework (RDF) is a framework for representing information about entities in a graph form. It formalizes the notion of entities and relationships between them and the graph thus produced.
+Resource Description Framework (RDF) is a framework for representing information about entities in a graph form. It formalizes the notion of entities and relationships between them and the graph thus produced. 
 
 An RDF-triple is a 3-tuple of (subject, predicate, object). While the subject is typically an entity, the object is allowed to be an entity or a non-entity. An RDF object is allowed to be an arbitrary string, which makes it flexible in capturing information such as dates, addresses, and other metadata information that a subject (entity) can be associated with. An RDF predicate is the realization of the concept of a relationship that describes the nature of association between the corresponding subject and object.
 
@@ -223,32 +223,32 @@ Since the RDF evolved around WWW, it encodes the subject, predicate and at times
 
 \begin{verbatim}
 1: <http://www.example.org/~joe/contact.rdf#joesmith>
-      <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>
+      <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>  
       <http://xmlns.com/foaf/0.1/Person>
-2: <http://www.example.org/~joe/contact.rdf#joesmith>
+2: <http://www.example.org/~joe/contact.rdf#joesmith>   
       <http://xmlns.com/foaf/0.1/homepage>
       http://www.example.org/~joe
-3: <http://www.example.org/~joe/contact.rdf#joesmith>
+3: <http://www.example.org/~joe/contact.rdf#joesmith>  
       <http://xmlns.com/foaf/0.1/mbox>
       mailto:joe.smith@example.org
 4: <http://www.example.org/~joe/contact.rdf#joesmith>
       <http://xmlns.com/foaf/0.1/givenname>
       Joe
-5: <http://www.example.org/~joe/contact.rdf#joesmith>
+5: <http://www.example.org/~joe/contact.rdf#joesmith>  
       <http://xmlns.com/foaf/0.1/family_name>
       Smith
 \end{verbatim}
 
 RDF predicates are represented as labelled arrows that connect an RDF subject (at their tail) to an RDF object (at their head).
 
-Many of the contemporary freely accessible knowledge bases support their distribution in RDF format. While an RDF document is natural way of representing and storing graphs, it is seldom useful in this form. Several RDF databases have emerged that allow loading of RDF documents support APIs that can be used to query and make use of the data. Traditional query languages like SQL are not well suited for querying RDF data, and thus there is a need for query languages and query processing engines that are targeted towards this format. SPARQL is one such query language that has been successful, and we shall now present its brief overview.
+Many of the contemporary freely accessible knowledge bases support their distribution in RDF format. While an RDF document is natural way of representing and storing graphs, it is seldom useful in this form. Several RDF databases have emerged that allow loading of RDF documents support APIs that can be used to query and make use of the data. Traditional query languages like SQL are not well suited for querying RDF data, and thus there is a need for query languages and query processing engines that are targeted towards this format. SPARQL is one such query language that has been successful, and we shall now present its brief overview. 
 
 
 \section[SPARQL]{SPARQL Protocol and RDF Query Language}
 
-SPARQL\cite{prud2008sparql} (recursive acronym for SPARQL Protocol and RDF Query Language) is a semantic query language for RDF databases. SPARQL allows users to write queries against what can loosely be described as ``key-value" data or, more specifically, data that follows the RDF specification of the W3C.
+SPARQL\cite{prud2008sparql} (recursive acronym for SPARQL Protocol and RDF Query Language) is a semantic query language for RDF databases. SPARQL allows users to write queries against what can loosely be described as ``key-value" data or, more specifically, data that follows the RDF specification of the W3C. 
 
-Though we earlier presented the RDF data model as a graph, it can also be thought of in terms of the SQL relational model as a table with three columns, one each for the subject, the predicate and the object. As we noticed earlier, the data in the object column can be heterogeneous in general, which in contrast with relational databases. The column data type is usually implied by the predicate value or may be specified separately in an ontology.
+Though we earlier presented the RDF data model as a graph, it can also be thought of in terms of the SQL relational model as a table with three columns, one each for the subject, the predicate and the object. As we noticed earlier, the data in the object column can be heterogeneous in general, which in contrast with relational databases. The column data type is usually implied by the predicate value or may be specified separately in an ontology. 
 
 As another alternative, all triples belonging to a particular subject may be represented as a single row of the table where the subject is the primary key. A column for each possible predicate may be stored, with the value in a cell storing an RDF object for (row, column) pair of (subject, predicate). However, as is seen in real world datasets, a column could contain multiple values (like the column `family members') for the same row key.
 
@@ -256,14 +256,14 @@ SPARQL provides a full set of analytic query operations such as JOIN, SORT, AGGR
 
 \subsection{Example Query}
 
-We shall now illustrate the basic syntax and features of SPARQL using a simple query on the data of Figure \ref{fig:rdfexample}.
+We shall now illustrate the basic syntax and features of SPARQL using a simple query on the data of Figure \ref{fig:rdfexample}. 
 
 The SPARQL query for retrieving (person, homepage) pairs for all persons in the data, is:
 \begin{verbatim}
   PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
   PREFIX w3: <http://www.w3.org/1999/02/22-rdf-syntax-ns>
   FROM foaf:graph
-
+  
   SELECT ?person ?homepage WHERE {
   ?person w3:type foaf:Person,
   ?person foaf:homepage ?homepage
@@ -273,7 +273,7 @@ The SPARQL query for retrieving (person, homepage) pairs for all persons in the 
 
 Since RDF subjects and predicates are represented as URIs, they tend to have common prefixes. To prevent repetition of these prefixes in the query, the \verb|PERFIX| keyword has been used in the above query. In general, an RDF database might contain multiple RDF graphs. The from keyword allows a user to specify a particular graph to be queried.
 
-The \verb|SELECT| clause asks to specify variables, which are then matched by the triple patterns inside the \verb|WHERE| clause. A triple pattern is simply an RDF triple, whose one or more elements have been replaced by variables.
+The \verb|SELECT| clause asks to specify variables, which are then matched by the triple patterns inside the \verb|WHERE| clause. A triple pattern is simply an RDF triple, whose one or more elements have been replaced by variables. 
 
 It is worth noting that triple patterns allow a natural way of expressing joins without an explicit schema, which makes SPARQL more powerful than storing RDF in a relational schema and running SQL queries on it as was previously discussed.
 
@@ -281,13 +281,13 @@ SPARQL has been implemented in a number of programming languages and graph datab
 
 \section{Freebase Knowledge Base}
 
-A major prerequisite for the success of Semantic Web is clearly the availability of large amounts of structured data. The effort of building and maintaining comprehensive datasets is largely divided in purpose and content by the organizations supporting these projects. At one end, there are freely accessible knowledge bases such as DBpedia, Wikidata, and Freebase; and at the other there are closed source projects such as Google Knowledge Graph and the Wolfram Knowledgebase.
+A major prerequisite for the success of Semantic Web is clearly the availability of large amounts of structured data. The effort of building and maintaining comprehensive datasets is largely divided in purpose and content by the organizations supporting these projects. At one end, there are freely accessible knowledge bases such as DBpedia, Wikidata, and Freebase; and at the other there are closed source projects such as Google Knowledge Graph and the Wolfram Knowledgebase. 
 
 For most of our work, we decided to stick to Freebase as our underlying data source. The choice demands us to tweak our approaches slightly to make use of the Freebase schema. Still, the ideas presented are sufficiently general and can be adapted to any of the popular knowledge bases.
 
 Freebase was a large collaborative knowledge base with data curated mainly by its community members. It first appeared in 2007 and was originally developed by the company Metaweb \footnote{en.wikipedia.org/wiki/Metaweb}. Though the project is no longer active, the complete data is available freely through Google Developers\footnote{developers.google.com/freebase}.
 
-Freebase contains tens of millions of topics, thousands of types, and tens of thousands of properties. There are more than a billion facts (loosely, RDF triples) that make up the Freebase graph. The magnitude can be appreciated on the comparison with Wikipedia, which has less than 5 million English articles.
+Freebase contains tens of millions of topics, thousands of types, and tens of thousands of properties. There are more than a billion facts (loosely, RDF triples) that make up the Freebase graph. The magnitude can be appreciated on the comparison with Wikipedia, which has less than 5 million English articles. 
 
 \subsection{Schema}
 
@@ -316,33 +316,33 @@ Thus, a type can be thought of as a conceptual container of properties that are 
 We shall describe other features of the Freebase schema, as and when required in the later chapters.
 
 
-%%%%%%%%%% Chapter 3 %%%%%%%%%%%%%%
+%%%%%%%%%% Chapter 3 %%%%%%%%%%%%%% 
 
 \chapter[Survey]{Survey of Existing Work}
 
 This chapter aims to give an overview of the existing work that tackles the problem of querying structured knowledge bases. As we discussed in Chapter 1, the use of structured query languages (e.g. SPARQL) is limited by requirement that the user must be aware of schema of the queried data. We will see in this chapter multiple approaches that seek to remedy that. A full coverage and critique of all approaches is beyond the scope of this report, so we shall select a few interesting ones for the purpose of this chapter. The approaches will be organized by their central ideas.
 
 \section[Keyword Queries]{Free-Keyword Querying}
-
+ 
  In \cite{elbassuoni2011keyword}, the authors develop a retrieval model that enables users to search RDF graphs using keywords. In contrast to approaches that retrieve entity tuples, the model here returns a ranked list of RDF \emph{subgraphs}. Retrieving subgraphs allows the treatment of triples in a holistic manner by explicitly taking into account the relationships between entities.
-
+ 
  To process keyword queries over RDF graphs, the system associates each triple $t_i$ with a set of keywords derived from the subject and object of the triple, as well as representative keywords for the predicate and constructs a document $D_i$. The terms in the document $D_i$ are stemmed using any standard stemmer and then stored in an inverted index. In addition, the term frequency of term $w$ in $D_i$, referred to as $c(w, D_i)$, is also stored.
-
+ 
  The first step towards query processing is to retrieve a set of subgraphs that match the user keyword query. To avoid retrieving large and noisy subgraphs, the following constraints are imposed: 1) the subgraphs should be unique and maximal (no subgraph should be a subset of any other subgraph retrieved), and 2) the subgraphs should contain triples matching different sets of keywords (no triples in the same subgraph should match the exact same set of keywords). The rationale behind the latter constraint is that if two triples match the same set of keywords, they are parts of two different possible results to the user query, and should be considered as parts of two separate subgraphs.
-
+ 
  Let the keyword query be $q = \{q_1, q_2, ..., q_m\}$, the subgraph-retrieval algorithm utilizes the inverted index to retrieve lists $\{L_1, L_2, ..., L_m\}$. The set $E$ of all unique triples in all lists can be viewed as a disconnected graph\footnote{each triple can be viewed as an edge where its subject  and object are nodes} and is referred to as the query graph. An adaptation of the network-motif detection algorithm \cite{wernicke2005faster} is used on $E$ to retrieve the desired subgraphs. We omit the discussion here.
-
+ 
  On retrieving a set of subgraphs matching a given keyword query, the next step is to rank these subgraphs. The ranking model is based on statistical language model techniques \cite{ponte1998language}. Given a subgraph $G = \{t_1, t_2, ..., t_n\}$, where $t_i$ is a triple, and the query $q = \{q_1, q_2, ..., q_m\}$ where $q_i$ is a single term, the subgraph G  is ranked based on the probability of generating the query Q given the subgraph $G$'s language model. Independence is assumed between the query terms, and likelihood $\text{Pr}(q|G)$ is computed as:
  $$ \text{Pr}(q|G) = \prod_{i=1}^{m} \text{Pr}(q_i|G)$$
- where $\text{Pr}(q_i|G)$ denotes the probability of term $q_i$ in the language model of $G$. The language model of subgraph $G$ is computed as a mixture model of the language models of its constituent triples,
-
+ where $\text{Pr}(q_i|G)$ denotes the probability of term $q_i$ in the language model of $G$. The language model of subgraph $G$ is computed as a mixture model of the language models of its constituent triples, 
+ 
  $$ \text{Pr}(q_i|G) = \frac{1}{n} \sum_{j=1}^{n} \text{Pr}(q_i|t_j)$$
 
  where $\text{Pr}(q_i | t_j)$ is computed from the document $D_j$ constructed earlier.
-
+ 
  The performance of the above model is compared with well-known techniques for keyword search over structured data \cite{bhalotia2002keyword, nie2007web} and we refer the interested reader to the original paper \cite{elbassuoni2011keyword} for that.
-
-
+ 
+ 
 \section{Converting queries to SPARQL}
 
 DEANNA \cite{yahya2012deep} is a framework for natural language question answering over structured knowledge bases. The approach followed by DEANNA is to convert the natural language question to an appropriate SPARQL query that can be then processed over the knowledge base. By far, the main challenge addressed is that of disambiguating user intent expressed in the verbal phrases and noun phrases in the question, and doing this in a globally coherent manner.
@@ -358,7 +358,7 @@ Next, the system attempts to detect \emph{triploids} in the natural language que
   \caption{Disambiguation graph. Attribution: \cite{yahya2012deep}}
 \end{figure}
 
-The next (and probably the most interesting) step is to perform disambiguation to resolve the mappings of phrases to semantic items. This is done in a joint manner---a weighted disambiguation graph is constructed and a dense subgraph is sought. A disambiguation graph (Figure \ref{fig:disgraph}) is a 3-partite graph with weighted edges. The edge weights are given as a combination of semantic coherence and syntactic similarity. Q-nodes collect triples of phrases together and this can been seen as dotted edges in Figure \ref{fig:disgraph}.
+The next (and probably the most interesting) step is to perform disambiguation to resolve the mappings of phrases to semantic items. This is done in a joint manner---a weighted disambiguation graph is constructed and a dense subgraph is sought. A disambiguation graph (Figure \ref{fig:disgraph}) is a 3-partite graph with weighted edges. The edge weights are given as a combination of semantic coherence and syntactic similarity. Q-nodes collect triples of phrases together and this can been seen as dotted edges in Figure \ref{fig:disgraph}. 
 
 The problem of disambiguation now translates to finding a dense subgraph in the disambiguation graph. The density measure is a function of edge weights (which measure syntactic similarity and semantic coherence). Further constraints are put on the subgraph such that it represents a valid triple. The objective and the constraints are encoded as an integer linear program and fed into an ILP solver---which then returns the required subgraph.
 
@@ -371,26 +371,26 @@ Once the disambiguation is completed, semantic grouping is performed which forms
 
  GQBE \cite{jayaram2013querying} proposes to query knowledge graphs by example entity tuples. The user input and output of GQBE are both entity tuples,
 called query tuples and answer tuples, respectively. Plainly stated, given a data graph $G$ and a query tuple $t$, GQBE tries to find the top-$k$ answer tuples $t'$ with the highest similarity scores $\text{score}_t(t')$.
-
-
+ 
+ 
  $\text{score}_t(t')$ is computed by matching the inter-entity relationships of $t$ and that of $t'$. Matching is not done on an entity-level in $t$, rather, a neighborhood graph is constructed (captures `features' that might be of interest to users) from $t$ and $\text{score}_t(t')$ entails matching two
  graphs constructed from $t$ and $t'$ respectively.
-
+ 
  The neighborhood graph $H_t$ of an example tuple $t$ is a weakly connected undirected subgraph of $G$ (the data graph) consisting of all nodes reachable from nodes of $t$ by an undirected path of length less than a user defined threshold $d$.
-
+ 
  It is observed that $H_t$ can be enormously large even for small values of $d$ (800K nodes for $d = 2$ in case of Freebase). Therefore, GQBE constructs a Maximum Query Graph (MQG) from $H_t$ which is expected to be drastically smaller than $H_t$ and yet capturing important features of the query tuple. $MQG_t$, given
  a parameter $m$, is a weakly connected subgraph of the  neighborhood graph $H_t$ that maximizes total edge weight
  $\sum_e w(e)$ while satisfying the constraints that it contains all the nodes in $t$, and contains at most $m$ edges.
-
+ 
  The decision version of finding $MQG_t$ for a given $m$ is shown to be NP-hard, and therefore GQBE employs a greedy algorithm to get an approximate $MQG_t$.
-
+ 
  Given a $MQG_t$, the goal is to find answer graphs $A$ which have high similarity to $MQG_t$. An answer graph $A$ to a query graph $Q$ is a
  weakly connected subgraph of $G$ that is edge-isomorphic to $Q$. Similarity is defined as a composite of a content-score and a structure-score. Structure-score captures measures the important structure in $MQG_t$ that is captured by $Q$. Content-score is defined by giving extra credit for identical nodes among the matching nodes in answer graph $A$ and query graph $Q$.
-
- Finally, GQBE searches $G$ for the top-$k$ answer subgraphs (according to the similarity score) in a best-first manner. We omit the algorithm in this discussion.
-
+ 
+ Finally, GQBE searches $G$ for the top-$k$ answer subgraphs (according to the similarity score) in a best-first manner. We omit the algorithm in this discussion. 
+ 
  \section{Interactive Queries}
-
+ 
  Next, we cover FreeQ \cite{demidova2012freeq} - an interactive interface for incremental query construction. It enables a user to start with simple keywords and incrementally refine them into a structured query that captures the user's information need. Figure \ref{fig:freeq} illustrates the FreeQ user interface.
 
  \begin{figure}[h!]
@@ -402,21 +402,21 @@ GUI include: (1) an input field for keyword query,
 and (4) query results. Attribution: \cite{demidova2012freeq}}
  \label{fig:freeq}
  \end{figure}
-
- When a user issues a keyword query, say \texttt{"Tom Hanks Terminal"}, FreeQ tries to guess the user intent and displays the top-$k$ most likely structured queries in the query window. The user can then click on any of these if it satisfies their information need.
-
- In the common case, the right structured query will not the identified immediately. The user can then use various interaction options (in the interaction panel) that further clarify intent. These interaction options are simple questions, for example \emph{"Is Tom Hanks a person?"}, and \emph{"Is Terminal an entity in the film domain?"}. Each interaction refines the list of available structured queries to those that comply with the user's selection.
-
+ 
+ When a user issues a keyword query, say \texttt{"Tom Hanks Terminal"}, FreeQ tries to guess the user intent and displays the top-$k$ most likely structured queries in the query window. The user can then click on any of these if it satisfies their information need. 
+ 
+ In the common case, the right structured query will not the identified immediately. The user can then use various interaction options (in the interaction panel) that further clarify intent. These interaction options are simple questions, for example \emph{"Is Tom Hanks a person?"}, and \emph{"Is Terminal an entity in the film domain?"}. Each interaction refines the list of available structured queries to those that comply with the user's selection. 
+ 
  Conceptually, the main idea is as follows: given a keyword query $K$, the system generates all possible query interpretations of $K$ based on data graph $G$. The set of query interpretations is called the interpretation space of $K$, denoted by $\zeta$. The system also generates a set of interaction options $IO$. If the user selects any interaction option $IO$, the interpretation space $\zeta$ is reduced and further the system displays the top-$k$ interpretations from $\zeta$. The process terminates when the user finds the intended structured query, otherwise it continues generating further interaction options.
-
+ 
  It is essential to select the interaction options that can reveal as much information about the user’s intent as possible, i.e., the interaction options with the highest \emph{information gain} need to be identified. FreeQ utilizes the hierarchical conceptual models on top of the database schema to generate interaction options that yield high information gain.
-
+ 
  FreeQ extends the Freebase schema with the domain hierarchy of Freebase. Also, FreeQ provides some other types of general interaction options based on hierarchical ontologies. To this end, FreeQ makes use of some external ontologies, such as WordNet \cite{miller1995wordnet} and YAGO \cite{suchanek2007yago}.
-
+ 
  The generation of interpretation space is required before top-$k$ interpretations can be obtained. A naive materialization is infeasible for knowledge bases as large as Freebase. FreeQ  uses a query hierarchy introduced in \cite{demidova2012probabilistic}. The hierarchy is grown incrementally during the user interaction phase and generates only the most probable query construction options that comply with the user's selection in each step.
-
-
-
+ 
+ 
+ 
 \begin{comment}
 \section{Query interpretation based on history}
 Fu and Anyanwu [33] propose a context-aware approach for keyword query interpretation that personalizes the interpretation process based on a user’s query context.
@@ -455,15 +455,15 @@ Here, a $>$ 1 is a positive integer constant.
 Historical impact factor captures the
 property that the relevance between a query and a graph element will decrease
 when that query ages out of the query history. hif is a monotonically decreasing
-function:
+function: 
 \begin{align}
 hif(t) = \frac{1}{b^{T-t}}
 \end{align}
 where b $>$ 1 is also a positive integer constant.
 
-
+ 
 \section{Alternate query languages}
-Pound et al. [30] approach the keyword disambiguation problem by ranking different possible rewritings of a query based on their syntactic relationship to the keywords in the query as well as their semantic coherence in the underlying knowledge base.
+Pound et al. [30] approach the keyword disambiguation problem by ranking different possible rewritings of a query based on their syntactic relationship to the keywords in the query as well as their semantic coherence in the underlying knowledge base. 
 
 In case of unstructured data,
 data can be of any type, not necessarily follow any format or rule. e.g. text,video,sound etc. On the other
@@ -493,9 +493,9 @@ given the KB. Next, top k of those structured queries are evaluated to find pote
 and their corresponding documents. The documents are then returned to the user ranked by some relevance
 metric.
 
-MashQL [31] present a query formulation language in order to easily query and fuse structured
-data on the web where users can specify filters. It is designed without loss of generality and
-can be used for querying relational databases, XML, RDF and web tables.
+MashQL [31] present a query formulation language in order to easily query and fuse structured 
+data on the web where users can specify filters. It is designed without loss of generality and 
+can be used for querying relational databases, XML, RDF and web tables. 
 
 \section{Corpus}
 35 propose two new, natural formulations for joint query interpretation and response ranking that exploit bidirectional flow of information between the knowledge base and the corpus.
@@ -598,7 +598,7 @@ and
 a proposed relation type
 r
 in the KG.
-\item
+\item 
 $ \Psi $\textsubscript{T\textsubscript{2}}
 (
 q,z,t\textsubscript{2}
@@ -824,7 +824,7 @@ properties and inter-relationships.
 \end{comment}
 
 
-%%%%%%%%%% Chapter 4 %%%%%%%%%%%%%%
+%%%%%%%%%% Chapter 4 %%%%%%%%%%%%%% 
 
 \chapter[ER Keyword Querying]{Entity Relationship Keyword Queries}
 
@@ -870,26 +870,26 @@ We now illustrate another example to ease understanding of our ERQ formalism. Su
 \item Number of entities is 3.
 \item $C_1=$\{`person'\}, $C_2=$\{`person'\}, and $C_3=$\{`university'\}.
 \item $K_1=$\{`US', `President'\}, $K_2=$\{`US', 'President'\}, and $K_3=$\{\}.
-\item $R_{12}=$\{`parent'\}, $R_{13}=$\{`education'\}, and $R_{23}=$\{`education'\},
+\item $R_{12}=$\{`parent'\}, $R_{13}=$\{`education'\}, and $R_{23}=$\{`education'\}, 
 \end{itemize}
 
-As we observed in Chapter 3, the problem of segmenting a user keyword query into the keywords for type/categories of entities sought and those for describing relationship between these entities inherently limits the performance (in both precision and recall) of the querying system. The ER query model might seem like a convenient ignorance of such issues, and in many ways it is. Our stance is that ER queries do not expect the amount of user sophistication that SPARQL querying systems expect. It is a sweet compromise between SPARQL querying and free-keyword querying that allows us to focus on challenges beyond query segmentation. Further, we believe that our ideas in this work can be supplemented with a layer of query segmentation---enabling free-keyword querying.
+As we observed in Chapter 3, the problem of segmenting a user keyword query into the keywords for type/categories of entities sought and those for describing relationship between these entities inherently limits the performance (in both precision and recall) of the querying system. The ER query model might seem like a convenient ignorance of such issues, and in many ways it is. Our stance is that ER queries do not expect the amount of user sophistication that SPARQL querying systems expect. It is a sweet compromise between SPARQL querying and free-keyword querying that allows us to focus on challenges beyond query segmentation. Further, we believe that our ideas in this work can be supplemented with a layer of query segmentation---enabling free-keyword querying. 
 
 \subsection{Query Graph}
-Any given ER query can be thought of as edge-labelled directed graph $G = (V, E)$, with the vertex set $V = \{e_1, e_2, ..., e_n\}$ and the
-labelled edge edge set $E = \{(e_i \xrightarrow{R_{ij}} e_j) \; | \; \forall \; R_{ij} \in \text{query} \}$. Answering the query would then
-mean finding subgraphs in the data that \emph{match} the query graph. In this direction, the ER keyword query model can be viewed as a
+Any given ER query can be thought of as edge-labelled directed graph $G = (V, E)$, with the vertex set $V = \{e_1, e_2, ..., e_n\}$ and the 
+labelled edge edge set $E = \{(e_i \xrightarrow{R_{ij}} e_j) \; | \; \forall \; R_{ij} \in \text{query} \}$. Answering the query would then 
+mean finding subgraphs in the data that \emph{match} the query graph. In this direction, the ER keyword query model can be viewed as a 
 relaxed variant of SPARQL query\footnote{The ER keyword query model is still very basic in comparison to SPARQL---which supports operations like sorting and aggregation that we do not consider here. Extensions of the ER keyword query model to support aggregation are left as future work.}, in which keywords can be used in place of actual schema elements of the data. While we do not explicitly use the graph interpretation of the query, except when a \emph{join} is required to produce the final results, it is still an important aid in visualizing the overall query processing mechanism.
 
 \section{Query Processing}
 
-The central goal of our work is to enable users to query structured knowledge bases without expecting \emph{any} schema knowledge whatsoever. In the context of the ER query model described previously, this means that keywords supplied in a user query will not in general match those used for data representation in the underlying data source. For example, a user might use the relation keyword \texttt{"established"} to mean ``establishment" of a company or an organization; but in the data source, the actual predicate sought could be \texttt{"founded"}---which roughly means the same as \texttt{"established"} in case of companies.
+The central goal of our work is to enable users to query structured knowledge bases without expecting \emph{any} schema knowledge whatsoever. In the context of the ER query model described previously, this means that keywords supplied in a user query will not in general match those used for data representation in the underlying data source. For example, a user might use the relation keyword \texttt{"established"} to mean ``establishment" of a company or an organization; but in the data source, the actual predicate sought could be \texttt{"founded"}---which roughly means the same as \texttt{"established"} in case of companies. 
 
-Therefore, to achieve superior recall, we must explore many possible \emph{meanings} of a keyword used by the user.
+Therefore, to achieve superior recall, we must explore many possible \emph{meanings} of a keyword used by the user. 
 
-Further, a user specified keyword could be ambiguous, in the sense that it could could mean any of a number of entities/predicates in the data. To achieve superior precision, we must be able to disambiguate the intent of the user query.
+Further, a user specified keyword could be ambiguous, in the sense that it could could mean any of a number of entities/predicates in the data. To achieve superior precision, we must be able to disambiguate the intent of the user query. 
 
-Our approach towards the above two problems is of asking the user for help. More concretely, our query processing engine shall prompt the user to select a subset of intermediate \emph{candidate} that entities or predicates that the system might be evaluating during query processing.
+Our approach towards the above two problems is of asking the user for help. More concretely, our query processing engine shall prompt the user to select a subset of intermediate \emph{candidate} that entities or predicates that the system might be evaluating during query processing. 
 
 Overall, the query processing proceeds with the repeated execution of two steps: 1) Predicate Selection, and 2) Entity Selection.
 
@@ -934,7 +934,7 @@ Latent variables $t_i, t_j$ are introduced in (\ref{eq:1}), representing the typ
 
 \item $\text{Pr}(C_i,C_j|t_i,t_j,R_{ij},p) = \text{Pr}(C_i,C_j|t_i,t_j)$, i.e., the category keywords are independent of $R_{ij}$ and $p$, once $t_i$ and $t_j$ are known.
 
-\item $\text{Pr}(C_i,C_j|t_i,t_j) = \text{Pr}(C_i|t_i) \cdot \text{Pr}(C_j|t_j)$, i.e., $C_i$ and $C_j$ are independent of each other and of any types other than $t_i$ and $t_j$, respectively.
+\item $\text{Pr}(C_i,C_j|t_i,t_j) = \text{Pr}(C_i|t_i) \cdot \text{Pr}(C_j|t_j)$, i.e., $C_i$ and $C_j$ are independent of each other and of any types other than $t_i$ and $t_j$, respectively.  
 \end{enumerate}
 
 Thus, we now have:
@@ -968,7 +968,7 @@ where $\phi_2$ is defined as,
 \end{align}
 Arguments to functions $\phi_1$ and $\phi_2$ are omitted in Equations \ref{eq:omphi1}, \ref{eq:main2}, \ref{eq:ugly2} and \ref{eq:phi2}  for the lack of horizontal space.
 
-Throughout this section we have dealt with probabilities and have ultimately arrived at a set of probabilities to be computed. We understand that such probabilities in the Bayesian sense of the word are hard to estimate, if at all well defined. We therefore, tweak our notation a little, replacing probabilities $\text{Pr}$ with potentials $\psi$. The entire derivation continues to hold, even with the modified semantics.
+Throughout this section we have dealt with probabilities and have ultimately arrived at a set of probabilities to be computed. We understand that such probabilities in the Bayesian sense of the word are hard to estimate, if at all well defined. We therefore, tweak our notation a little, replacing probabilities $\text{Pr}$ with potentials $\psi$. The entire derivation continues to hold, even with the modified semantics. 
 
 For the rest of this chapter, we use the following notation:
 \begin{enumerate}
@@ -985,15 +985,15 @@ The potentials $\psi$ used above can be compactly represented as an undirected p
 \subsubsection{Estimating $\psi(p)$}
 $\psi(p)$ is simply the prior on the predicate $p$. We estimate it as:
 $$\psi(p) = \frac{\text{freq}(p)}{\sum_{p_i \in \mathbb{P}}\text{freq}(p_i)}$$
-where $\mathbb{P}$ is the set of all possible predicates in our RDF data source.
+where $\mathbb{P}$ is the set of all possible predicates in our RDF data source. 
 
 \subsubsection{Estimating $\psi(R_{ij}, p)$, $\psi(C_i, t_i)$, and $\psi(K_i, e_i)$}
-The  potentials $\psi(R_{ij}, p)$, $\psi(C_i, t_i)$, and $\psi(K_i, e_i)$ are similar in the sense that they all capture the agreement between two variables: one of them being keywords supplied in the user query and the other being a predicate, type, or an entity in the structured data source.
+The  potentials $\psi(R_{ij}, p)$, $\psi(C_i, t_i)$, and $\psi(K_i, e_i)$ are similar in the sense that they all capture the agreement between two variables: one of them being keywords supplied in the user query and the other being a predicate, type, or an entity in the structured data source. 
 For example, if the the relation keywords $R_{ij}$ are \texttt{"death reason"} and the related entity sought is of type \texttt{person}, then $R_{ij}$ should match to the predicate \texttt{/people/} \texttt{deceased\_person/} \texttt{cause\_of\_death} rather than the predicate \texttt{/people/} \texttt{deceased\_person/} \texttt{place\_of\_death}.
 
 There may exist considerable variation in how keywords are represented in a query. The relation language model needs to build a bridge between the formal $p$ and the textual $R_{ij}$, so that (un)likely $p$'s have (small) large potential. Plenty of approaches \cite{berant2013semantic, berant2014semantic, kwiatkowski2013scaling, yih2014semantic} to this problem have been studied recently. We choose a pattern-based approach akin to PATTY \cite{nakashole2012patty} for its simplicity and scalability to large amounts of data.
 
-For each Freebase predicate $p$, we discover the most strongly associated phrase patterns from a reference corpus, then mark these patterns into much larger payload corpus.
+For each Freebase predicate $p$, we discover the most strongly associated phrase patterns from a reference corpus, then mark these patterns into much larger payload corpus. 
 The ClueWeb09 corpus annotated with Freebase entities \cite{gabrilovich2013facc1} may be used for this purpose. For each Freebase predicate $p$, we consider all triples and locate all the corpus sentences that mention both the participating entities of the triple. We assume, rather crudely, that if the entities $e_i$ and $e_j$ co-occur in a sentence then this sentence is an evidence of the triple $\langle e_i, p, e_j \rangle$. Each such sentence is parsed to obtain a dependency graph using the Malt Parser \cite{nivre2007maltparser}
 
 We present the approach towards estimating $\psi(R_{ij}, p)$; those for $\psi(C_i, t_i)$ and $\psi(K_i, e_i)$ will be similar and shall be added in later versions of this work. The following brief description is based on \cite{joshiknowledge}.
@@ -1017,7 +1017,7 @@ Note that the filtering operation above can be easily carried out in case of Fre
 \subsubsection{Estimating $\psi(e_i,e_j,t_i,t_j,p)$}
 Though $\psi(e_i,e_j,t_i,t_j,p)$ must take into account the $e_i$--$t_i$, and $e_j$--$t_j$ compatibility, we make a simplifying assumption without deviating a lot from the intended semantics of $\psi(e_i,e_j,t_i,t_j,p)$.
 
-Define,
+Define, 
 \begin{align}
 \psi(e_i,e_j,t_i,t_j,p) = \frac{n(e_i, e_j; p)}{n(p)} \label{eq:psi4}
 \end{align}
@@ -1027,7 +1027,7 @@ where $n(e_i, e_j; p) = 1$ if the triple $\langle e_i, p, e_j \rangle$ occurs in
 Now that we have defined the quantities involved in Equation \ref{eq:main3}, we can compute the summation involved on the right hand side. Note that only $\psi(e_i, e_j | t_i, t_j, p)$ involves all the summation variables $t_i, t_i, e_i, e_i$ and can be expensive to compute. The summation on the other terms can be computed rather cheaply.
 
 \begin{comment}
-Looking back at our definition of $\psi(e_i, e_j | t_i, t_j, p)$ in Equation \ref{eq:psi4},
+Looking back at our definition of $\psi(e_i, e_j | t_i, t_j, p)$ in Equation \ref{eq:psi4}, 
 
 \begin{align}
 \sum_{t_i, t_j, e_i, e_j} \psi(e_i, e_j | t_i, t_j, p) & = \sum_{t_i, t_j, e_i, e_j} \frac{n(e_i, e_j; p)}{n(p)} \nonumber \\
@@ -1072,13 +1072,13 @@ As previously done for the case of entity selection, we change the semantics of 
 \subsubsection{Estimating $\psi(e)$}
 $\psi(e)$ is simply the prior on entity $e$. We estimate it as:
 $$\psi(e) \approx \frac{\text{freq}(e)}{\sum_{e_i \in \mathbb{E}}\text{freq}(e_i)}$$
-where $\mathbb{E}$ is the set of entities considered for ranking.
+where $\mathbb{E}$ is the set of entities considered for ranking. 
 
 \subsubsection{Estimating $\psi(K_i, e)$}
 An initial approach is to use WordNet synsets of the short description available for the entity $e$; and set $\psi(K_i, e)$ for any matching words in the synsets. With the availability of entity-annotated corpora and on-the-fly entity annotators \cite{ferragina2010tagme}, more sophisticated measures can be defined.
 
 \subsubsection{Estimating $\psi(C_i, e)$}
-A Freebase entity can in general, be associated with several types $t_1, ..., t_m$. We define,
+A Freebase entity can in general, be associated with several types $t_1, ..., t_m$. We define, 
 \begin{align}
  \psi(C_i, e) = \sum_{j=1}^{m} \psi(C_i, t_j)
 \end{align}
@@ -1092,13 +1092,13 @@ It is natural to have the following definition,
 where $n(p_{ij_{k}}, e)$ is the number of triples that have $e$ related by the predicate $p_{ij_{k}}$, and $n(e)$ is the total number of triples of $e$.
 
 \subsubsection{Computation}
-The summation in Equation \ref{eq:entmain3}, when rewritten in product-of-sum form, is not expected to be computationally expensive owing to the following observations:
+The summation in Equation \ref{eq:entmain3}, when rewritten in product-of-sum form, is not expected to be computationally expensive owing to the following observations: 
 \begin{enumerate}
   \item The predicates $p_{ij_1}, p_{ij_r}, ..., p_{ij_r}$ are the predicates that concern the entity variable $e_i$ in the query. Therefore, for even the most convoluted (and meaningful) queries one can think of, $r$ would be a small number ($< 10$ let's say).
-  \item The predicate selection step would have been completed for these predicates before entity selection is done for the entity variable $e$. This limits the total number of terms in the sum, allowing for cheap computation of the overall \emph{score}.
+  \item The predicate selection step would have been completed for these predicates before entity selection is done for the entity variable $e$. This limits the total number of terms in the sum, allowing for cheap computation of the overall \emph{score}.   
 \end{enumerate}
 
-Further success can be had by precomputing some of the quantities $\psi$.
+Further success can be had by precomputing some of the quantities $\psi$. 
 
 The argmax computation can be done away with, and top-k ranking entities can be chosen as the candidates to be presented to the user. Even the score is not required to be computed for all entities and this step can be assisted by using a heuristic to filter a larger set of candidate entities; and then computing the ranking for these entities. An initial heuristic would be to perform a keyword search using the selector keywords (and their synonyms) of the entity and to perform ranking for the result entities. Keyword search can be supported by systems like Apache Solr \cite{smiley2015apache}.
 
@@ -1107,7 +1107,7 @@ The argmax computation can be done away with, and top-k ranking entities can be 
 At this stage, we have a set of selected entities for each entity variable sought by the query, and also a set of selected predicates for each of the relations between pairs entity variables in the query. We can further assume with some confidence that sizes of these set would not be too large. In such a situation, arriving at the result set is a matter of computing the join of selected entity sets corresponding  to adjacent entities in the query-graph. Further filtering may be required to discard (entity-predicate-entity) tuples that do not have matching triples in the data.
 
 
-%%%%%%%%%% Chapter 5 %%%%%%%%%%%%%%
+%%%%%%%%%% Chapter 5 %%%%%%%%%%%%%% 
 
 %\addtocontents{toc}{\protect\newpage}
 
@@ -1116,7 +1116,7 @@ At this stage, we have a set of selected entities for each entity variable sough
 In the last chapter we introduced the Entity Relationship Keyword Querying model. In the present chapter, we shall describe the implementation of the same. For many of the computations involved in query processing, there are several possible ways to carry them out. The following exposition shall discuss the relative merits and demerits of the possible approaches. Most of the ideas are uncomplicated, but as is often said, the devil is in the detail.
 
 \section{Predicate Selection}
-As we saw in section \ref{predsel}, one of the query processing steps is to produce a ranked list of candidate predicates for each set of relation keywords $R_{ij}$ in the query. We discussed in section \ref{predselint} the joint interpretation ranking approach which takes into account all parts of the query in a holistic manner in order to produce a ranking of candidate predicates for given relation keywords $R_{ij}$.
+As we saw in section \ref{predsel}, one of the query processing steps is to produce a ranked list of candidate predicates for each set of relation keywords $R_{ij}$ in the query. We discussed in section \ref{predselint} the joint interpretation ranking approach which takes into account all parts of the query in a holistic manner in order to produce a ranking of candidate predicates for given relation keywords $R_{ij}$. 
 
 Recall that the score given to a candidate predicate is based on the following computation:
 \begin{align}
@@ -1127,15 +1127,16 @@ where $\phi_2$ is defined as,
 \phi_2 =  \psi(t_i,t_j,p) \cdot \psi(C_i,t_i) \cdot \psi(C_j,t_j) \cdot \psi(e_i,e_j,t_i,t_j,p) \cdot \psi(K_i,e_i) \cdot \psi(K_j,e_j) \label{eq:phi2}
 \end{align}
 
-Let us assume that we have a function $\psi_{R}(R_{ij}) : \mathcal{R} \rightarrow \mathbb{R}^{|\mathbb{P}|}$, which produces a score vector of length $|\mathbb{P}|$ given a bag of relation keywords $R_{ij}$. In the above notation $\mathcal{R}$ denotes the set of all possible bags of relation keywords, $\mathbb{P}$ is the set of all freebase predicates, and $\mathbb{R}$ is the set of real numbers. Further, let $\overrightarrow{\psi_{freq}} \in \mathbb{R}^{|\mathbb{P}|}$ denote the vector of all $\psi(p)$.
+Let us assume that we have a function $\psi_{R}(R_{ij}) : \mathcal{R} \rightarrow \mathbb{R}^{|\mathbb{P}|}$, which produces a score vector of length $|\mathbb{P}|$ given a bag of relation keywords $R_{ij}$. In the above notation $\mathcal{R}$ denotes the set of all possible bags of relation keywords, $\mathbb{P}$ is the set of all freebase predicates, and $\mathbb{R}$ is the set of real numbers. Further, let $\overrightarrow{\psi_{freq}} \in \mathbb{R}^{|\mathbb{P}|}$ denote the vector of all $\psi(p)$. 
 
 Then, we compute the dot product $\overrightarrow{\psi_{freq}} \cdot \psi_{R}(R_{ij}) = \overrightarrow{\psi_{local}(R_{ij})}$
  that captures the compatibility of various freebase predicates with the relation keywords $R_{ij}$, considering $R_{ij}$ part of the query in isolation (ignoring the existence of various category keywords $C_i$ and selector keywords $K_i$ etc.).
-
+ 
 Since the summation in equation \ref{eq:predsel1} is over a large number of 4-tuples $(t_i, t_j, e_i, e_j)$, the computation is likely to be infeasible. It is worth noting that we need not compute the score in equation \ref{eq:predsel1} for all freebase predicates, but only for those which have high representation in the vector $\overrightarrow{\psi_{local}(R_{ij})}$, as we seek only the top-$k$ scoring freebase predicates. Therefore, the score $\text{Score}(p|\vec{q})$ is computed for only the top-$k$ scoring freebase predicates as per $\overrightarrow{\psi_{local}(R_{ij})}$.
 
-
+ 
 \subsection{Computing $\psi(p)$}
+
 A single pass on the freebase dump is sufficient to compute the frequencies of freebase predicates. The restricted freebase subset used for our experiments consists of \textbf{6,106} predicates and the distribution is shown in figure \ref{preddist}. The sum of all frequencies, equals the number of triples in our restricted subset, and is found to be \textbf{827,615,838}.
 
 For our scoring, we have the following straightforward computation:
@@ -1161,13 +1162,13 @@ We construct micro-documents for each of the 6,106 freebase predicates with the 
 \item Synonyms of the freebase predicate name. WordNet may be used to construct the list of synonyms.
 \end{enumerate}
 
-Lucene implements a variant of the TfIdf scoring model. The Lucene scores are returned along with the top-$k$ search results--which may be directly used as a proxy for $\psi(R_{ij}, p)$
+Lucene implements a variant of the TfIdf scoring model. The Lucene scores are returned along with the top-$k$ search results--which may be directly used as a proxy for $\psi(R_{ij}, p)$ 
 
 \subsubsection{Using Word Embeddings}
-Techniques for training word-vectors jointly on a text corpus and a knowledge graph have been studied in the literature (see Appendix ...).
+Techniques for training word-vectors jointly on a text corpus and a knowledge graph have been studied in the literature (see Appendix ...). 
 
 \subsubsection{Using the ClueWeb09 corpus}
-An approach akin to that discussed in \cite{joshiknowledge} is especially relevant to our problem. The pattern-based approach, for each freebase predicate $p$, discovers the most strongly associated phrase patterns from a reference corpus and then marks these patterns into a larger payload corpus.
+An approach akin to that discussed in \cite{joshiknowledge} is especially relevant to our problem. The pattern-based approach, for each freebase predicate $p$, discovers the most strongly associated phrase patterns from a reference corpus and then marks these patterns into a larger payload corpus. 
 
 We continue our implementation using the 6,106 freebase predicates from the restricted dump, along with the ClueWeb09 corpus annotated with freebase entities \cite{gabrilovich2013facc1}. For each triple instance of each predicate, we locate all corpus sentences that mentioned both participating entities. Further, we make the assumption that if $<e_1, p, e_2>$ is a triple and $e_1, e_2$ co-occur in a sentence, then this sentence is an evidence of the predicate relationship. Each such sentence is parsed to obtain a dependency graph using the Malt Parser \cite{nivre2007maltparser}. Words in the path connecting the entities are joined together and added to a candidate phrase dictionary, provided the path is at most three hops. (Inspection suggested that longer dependency paths mostly arise out of noisy sentences or botched parses.) 30\% of the sentences were
 thus retained. Finally, the potential $\psi(R_{ij}, p)$ is computed as:
@@ -1176,7 +1177,7 @@ where $R'$ ranges over all phrases that are known to
 hint at $p$, and $n(p, R')$ denotes the number of sentences
 where the phrase $R'$ occurred in the dependency
 path between the entities participating in relation
-$p$.
+$p$. 
 
 Such a model, with assumptions like entity co-occurence implies evidence is admittedly simplistic. However, the primary function of the potential $\psi(R_{ij}, p)$ is to retrieve the top-$k$ freebase predicates that are compatible with the relation keywords $R_{ij}$. The remaining noise is mitigated by the collective scoring as per equation \ref{eq:predsel1}. With help from the authors of \cite{joshiknowledge}, we were able to re-use much of the CSAW\footnote{CSAW: Curating and Searching the Annotated Web. URL: \url{www.cse.iitb.ac.in/~soumen/doc/CSAW/}} codebase relevant to our problem.
 
@@ -1192,36 +1193,36 @@ type \url{/people/person/profession}.
 To end this subsection, we present a sample of the top-$k$ results obtained using the ClueWeb09 approach.
 
 \textbf{Query 1:} $R_{ij}$ = ``music genre"
-\begin{longtable}{| p{.50\textwidth} | p{.25\textwidth} |}
+\begin{longtable}{| p{.50\textwidth} | p{.25\textwidth} |} 
 \hline
 \textbf{freebase predicate} & $\psi(\text{``music genre", p})$ \\ \hline \hline
-\url{/music/genre/artists} & -15.099850431212927 \\ \hline
-\url{/book/magazine/genre} & -20.497121155364283 \\ \hline
-\url{/computer/software/software_genre} & -22.372291455561907 \\ \hline
-\url{/music/composition/place_composed} & -22.950699521833275 \\ \hline
-\url{/music/artist/track} & -23.0148181515611 \\ \hline
-\url{/music/composition/recordings} & -23.23339044018303 \\ \hline
-\url{/user/ramanan/default_domain/musical_composer/musical_genre} & -25.10161835390006 \\ \hline
-\url{/music/composer/compositions} & -25.72076068271463 \\ \hline
-\url{/theater/play/productions} & -25.96101012469272 \\ \hline
-\url{/music/track/engineer} & -26.237644347952646 \\ \hline
-\url{/language/language_dialect/language} & -26.386128015027555 \\ \hline
-\url{/sports/boxer/stance} & -27.420668175742207 \\ \hline
-\url{/cvg/cvg_platform/games} & -27.427647206990958 \\ \hline
-\url{/award/award_presenting_organization/award_categories_presented} & -27.4773367984373 \\ \hline
-\url{/language/conlang/conlang_type} & -27.49252674998958 \\ \hline
-\url{/finance/currency/countries_used} & -27.542240198731104 \\ \hline
-\url{/base/ballet/ballet_company/founder} & -27.735313060228982 \\ \hline
-\url{/book/book/characters} & -27.89643072212388 \\ \hline
-\url{/event/disaster/victims} & -28.272651728630475 \\ \hline
-\url{/sports/sport/officials} & -28.27390780566355 \\ \hline
+\url{/music/genre/artists} & -15.099850431212927 \\ \hline 
+\url{/book/magazine/genre} & -20.497121155364283 \\ \hline 
+\url{/computer/software/software_genre} & -22.372291455561907 \\ \hline 
+\url{/music/composition/place_composed} & -22.950699521833275 \\ \hline 
+\url{/music/artist/track} & -23.0148181515611 \\ \hline 
+\url{/music/composition/recordings} & -23.23339044018303 \\ \hline 
+\url{/user/ramanan/default_domain/musical_composer/musical_genre} & -25.10161835390006 \\ \hline 
+\url{/music/composer/compositions} & -25.72076068271463 \\ \hline 
+\url{/theater/play/productions} & -25.96101012469272 \\ \hline 
+\url{/music/track/engineer} & -26.237644347952646 \\ \hline 
+\url{/language/language_dialect/language} & -26.386128015027555 \\ \hline 
+\url{/sports/boxer/stance} & -27.420668175742207 \\ \hline 
+\url{/cvg/cvg_platform/games} & -27.427647206990958 \\ \hline 
+\url{/award/award_presenting_organization/award_categories_presented} & -27.4773367984373 \\ \hline 
+\url{/language/conlang/conlang_type} & -27.49252674998958 \\ \hline 
+\url{/finance/currency/countries_used} & -27.542240198731104 \\ \hline 
+\url{/base/ballet/ballet_company/founder} & -27.735313060228982 \\ \hline 
+\url{/book/book/characters} & -27.89643072212388 \\ \hline 
+\url{/event/disaster/victims} & -28.272651728630475 \\ \hline 
+\url{/sports/sport/officials} & -28.27390780566355 \\ \hline 
 
-\caption{List of freebase predicates retrieved for the relation keywords ``music genre", ordered by $\psi(R_{ij},p)$}
+\caption{List of freebase predicates retrieved for the relation keywords ``music genre", ordered by $\psi(R_{ij},p)$} 
 \label{tab:musicgenre}
 \end{longtable}
 
 \textbf{Query 2:} $R_{ij}$ = ``company founder"
-\begin{longtable}{| p{.50\textwidth} | p{.25\textwidth} |}
+\begin{longtable}{| p{.50\textwidth} | p{.25\textwidth} |} 
 \hline
 \textbf{freebase predicate} & $\psi(\text{``company founder", p})$ \\ \hline \hline
 
@@ -1247,7 +1248,7 @@ To end this subsection, we present a sample of the top-$k$ results obtained usin
 \url{/music/genre/artists} & -28.978547859731954 \\ \hline
 
 
-\caption{List of freebase predicates retrieved for the relation keywords ``company founder", ordered by $\psi(R_{ij},p)$}
+\caption{List of freebase predicates retrieved for the relation keywords ``company founder", ordered by $\psi(R_{ij},p)$} 
 \label{tab:companyfounder}
 \end{longtable}
 
@@ -1257,19 +1258,19 @@ To end this subsection, we present a sample of the top-$k$ results obtained usin
 \subsection{Computing $\psi(C_i, t_i)$}
 Similar to the $\psi(R_{ij},p)$ computation discussed in the previous section, the Lucene-based search and word embeddings approaches can be adapted to the $\psi(C_i, t_i)$ computation capturing the similarity between a bag of category keywords $C_i$ and a freebase type $t_i$.
 
-Again, due to easy access and support available for the CSAW codebase, we chose to go with a type language model discussed previously in \cite{joshiknowledge}.
+Again, due to easy access and support available for the CSAW codebase, we chose to go with a type language model discussed previously in \cite{joshiknowledge}. 
 Estimating the target entity type, without over-generalizing or overspecifying it, has always been important for QA. E.g., when $C_i$ is `city', a good type language model should prefer $t_i$ as \url{/location/citytown} over \url{/location/location} while avoiding \url{/location/es_autonomous_city}.
 
 A catalog like Freebase suggests a straightforward method to collect a type language model. Each type is described by one or more phrases through the link \url{/common/topic/alias}. We
 can collect these into a micro-document and use a standard Dirichlet-smoothed language model from IR \cite{zhai2008statistical}. In Freebase, an entity node (e.g., Einstein, \url{/m/0jcx}) may be linked to a type node (e.g. \url{/base/scientist/physicist}) using an edge with label \url{/type/object/type}. But relation types provide additional clues to types of the endpoint entities. Freebase relation types have the form \url{/x/y/z}, where \url{x} is the domain of the relation, and \url{y} and \url{z} are string representations of the type of the entities participating in the relation. E.g., the (directed) relation
-type \url{/location/country/capital} connects from from \url{/location/country} to \url{/location/citytown}. Therefore, ``capital" can be added to the set of descriptive phrases of entity type \url{/location/citytown}.
+type \url{/location/country/capital} connects from from \url{/location/country} to \url{/location/citytown}. Therefore, ``capital" can be added to the set of descriptive phrases of entity type \url{/location/citytown}. 
 
 It is important to note that while we use Freebase link nomenclature for relation and type language models, our models are not incompatible with other catalogs. Indeed, most catalogs have established ways of deriving language models that describe their various structures. For example, most YAGO types are derived from WordNet synsets with associated phrasal descriptions (lemmas). YAGO relations also have readable names such as actedIn, isMarriedTo, etc. which can be used to estimate language models. DBPedia relations are mostly derived from (meaningfully) named attributes taken from infoboxes,hence they can be used directly. Furthermore, others \cite{wu2007autonomously} have shown how to associate language models with such relations.
 
 Following are two sample runs of the above approach each returning top-$k$ freebase types (with scores) given a bag of category keywords $C_i$.
 
 \textbf{Query 1:} $C_i$ = ``tv show"
-\begin{longtable}{| p{.50\textwidth} | p{.25\textwidth} |}
+\begin{longtable}{| p{.50\textwidth} | p{.25\textwidth} |} 
 \hline
 \textbf{freebase type} & $\psi(\text{``tv show"}, t_i)$ \\ \hline \hline
 
@@ -1304,13 +1305,13 @@ Following are two sample runs of the above approach each returning top-$k$ freeb
 \url{/tv/tv_network_duration} & -11.139716932059311 \\ \hline
 
 
-\caption{List of freebase types retrieved for the category keywords ``tv show", ordered by $\psi(C_i,t_i)$}
+\caption{List of freebase types retrieved for the category keywords ``tv show", ordered by $\psi(C_i,t_i)$} 
 \label{tab:tvshow}
 \end{longtable}
 
 \textbf{Query 2:} $C_{i}$ = ``politician"
 
-\begin{longtable}{| p{.60\textwidth} | p{.25\textwidth} |}
+\begin{longtable}{| p{.60\textwidth} | p{.25\textwidth} |} 
 \hline
 \textbf{freebase type} & $\psi(\text{``politician"}, t_i)$ \\ \hline \hline
 
@@ -1339,7 +1340,7 @@ Following are two sample runs of the above approach each returning top-$k$ freeb
 \url{/base/aareas/schema/wales/principal_area} & -9.981251880954158 \\ \hline
 \url{/base/americanairlinesflight383/air_traffic_controllers_greater_cincinnati_airport_november_8_1965} & -9.989016934304846 \\ \hline
 
-\caption{List of freebase types retrieved for the category keywords ``politician", ordered by $\psi(C_i,t_i)$}
+\caption{List of freebase types retrieved for the category keywords ``politician", ordered by $\psi(C_i,t_i)$} 
 \label{tab:politician}
 \end{longtable}
 
@@ -1350,7 +1351,7 @@ The Lucene-based search approach is better suited for computing $\psi(K_i, e_i)$
 \item The availability of alias links (via the freebase predicate \url{/common/topic/alias} for entities, also aids the micro-document generation.
 \end{enumerate}
 
-Furthermore, the word embeddings approach for estimating $\psi(K_i,e_i)$ is straightforward too since Google has made available\footnote{Google Code Archive - word2vec. URL: \url{code.google.com/archive/p/word2vec/}} pre-trained entity vectors with freebase naming. The word2vec `distance' function can be called to return the freebase entities with the least cosine distance from the keyword query $K_i$ and the cosine distance itself can be used in lieu of $\psi(K_i,e_i)$.
+Furthermore, the word embeddings approach for estimating $\psi(K_i,e_i)$ is straightforward too since Google has made available\footnote{Google Code Archive - word2vec. URL: \url{code.google.com/archive/p/word2vec/}} pre-trained entity vectors with freebase naming. The word2vec `distance' function can be called to return the freebase entities with the least cosine distance from the keyword query $K_i$ and the cosine distance itself can be used in lieu of $\psi(K_i,e_i)$. 
 
 \subsection{Computing $\psi(t_i, t_j, p)$}
 Recall that we defined, $$\psi(t_i, t_j, p) = \frac{n(p;t_i,t_j)}{n(p)}$$ where $n(p;t_i,t_j)$ denotes the number of triples in freebase that contain the predicate $p$ and whose subject and object have the freebase types $t_i$ and $t_j$ respectively. $n(p)$ as before, denotes the number of freebase triples containing $p$ as the predicate.
@@ -1364,7 +1365,7 @@ The final $n(p;t_i,t_j)$ values are stored in a PostgreSQL table, along with $n(
 \subsection{Overall score computation for predicate selection}
 Among the quantities in \ref{eq:phi2}, we have so far discussed the computation of $\psi(p)$, $\psi(R_{ij},p)$, $\psi(C_i,t_i)$, $\psi(K_i,e_i)$ and $\psi(t_i,t_j,p)$. Since the summation in equation \ref{eq:predsel1} is over all $t_i$, $t_j$, $e_i$, $e_j$ involved, it is likely that the exact computation will be infeasible within reasonable expectations of query processing time. We therefore, for our prototyping purposes, drop the summation over $e_i$, $e_j$ by simply setting $\psi(e_i,e_j,t_i,	t_j,p) = 1$, $\psi(K_i,e_i) = 1$, and $\psi(K_j,e_j)$.
 
-Our simplified scoring model for predicates is thus,
+Our simplified scoring model for predicates is thus, 
 \begin{align}
 \text{Score}(p|\vec{q}) \propto \psi(p) \cdot \psi(R_{ij},p) \cdot \sum_{t_i,t_j} \psi(C_i,t_i) \cdot \psi(C_j,t_j) \cdot \psi(t_i,t_j,p) \label{eq:predselfinal}
 \end{align}
@@ -1373,27 +1374,31 @@ For our prototype implementation, we use Lucene scores as a proxy for $\psi(R_{i
 
 Once we have the list of candidate predicates and two lists for candidate types, and their respective scores, we probe each combination of $(t_i,t_j,p)$
  and fetch $\psi(t_i,t_j,p)$ using a PostgreSQL query. The product $\psi(C_i,t_i) \cdot \psi(C_j,t_j) \cdot \psi(t_i,t_j,p)$ is finally marginalized by summing over all candidate types for $t_i$ and $t_j$.
-
-The list of predicate scores thus obtained is sorted, and the top-100 predicates are sent to the user for selection. The use may select one or more of these predicates, thereby concluding one predicate selection step.
+ 
+The list of predicate scores thus obtained is sorted, and the top-100 predicates are sent to the user for selection. The user may select one or more of these predicates, thereby concluding one predicate selection step.	
 
 \section{Entity Selection}
 
-\section{Query Engine Architecture}
+For our initial prototype, we replace the earlier sophisticated entity ranking and selection model by a simple ranking of entities by $\psi(K_i,e_i)$ computed earlier.
 
+Micro-documents for each freebase entity are constructed, each containing the freebase description of the entity (linked via the predicate \url{/common/topic/description}) and its aliases (linked via the predicate \url{/common/topic/alias}). A Solr index is created on these micro-documents. Note that this index is separate from that created for freebase predicates. 
+
+In the entity selection step for $e_i$, the Solr index is queried with selector keywords $K_i$, which returns a list of freebase entities and their corresponding Lucene scores for the query. The selected predicates (for a predicate $p$ adjoining $e_i$ in the query graph) from a previous predicate selection step are joined with the entities returned by Solr to form triple patterns of the form $<e_i, p, ?o>$. A freebase dump set up on Openlink Virtuoso is queried with these triple patterns using Virtuoso's SPARQL endpoint. The set of entities for which the any of the corresponding SPARQL queries returns non-empty results are retained. These retained entities are ranked by the Lucene scores (already found from the initial Solr query), and presented to the user for selection.
+
+\section{Query Result}
+As mentioned in the previous section, the candidate entities are 
 
 \chapter{Conclusion and Future Work}
 
 The Entity Relationship Keyword Querying (ERKQ\footnote{Henceforth shall be referred to as ERKQ in all citations.}) framework, provides a powerful combination of ease-of-use and capability of processing complicated queries beyond the scope of existing systems. The former feature stems from the fundamental decision of permitting the user to query using free-keywords, albeit expecting it in a pre-segmented form. This pre-segmentation, along with a carefully crafted query interpretation layer, gives the framework the latter feature.
 
-Staying within the ERKQ model, there are multiple additions possible in the query processing mechanism that can improve the overall performance of the system.
+Staying within the ERKQ model, there are multiple additions possible in the query processing mechanism that can improve the overall performance of the system. 
 
 Recall that the query processing mechanism was described as to be involving the repetition of two actions (predicate selection and entity selection) for various elements (predicates and entities) of the query. It is not clear however, the order of actions that needs to be taken. We believe that great improvements are possible with work towards this end.
 
 The idea of repeating the two selections (say alternatively) is a simple one. Two (or more) selection steps could be combined into one. Even the idea of computing the joins at the end could be extended to computing intermediate joins and prompting the user for more intermediate selections. In approaches like the latter, there is always the inherent trade-off between ease-of-use (or user-discontent) and accuracy/precision of results.
 
 Within the query interpretation layer, we defined the various \emph{potentials} in the most obvious way possible. Sophisticated potential functions need to be designed and their effectiveness needs to be tested.
-
-Lastly, we refrained from mentioning that the narrated system has not been implemented. A complete implementation of the ideas contained in this work is the most critical requirement of the hour, for there are far more ways in which an implementation could fail than it could on paper.
 
 \bibliographystyle{apalike}
 \addcontentsline{toc}{chapter}{Bibliography}

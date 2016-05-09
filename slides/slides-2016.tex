@@ -14,7 +14,7 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{graphicx}
-
+\usepackage{longtable}
 
 \DeclareMathOperator*{\argmax}{arg\!\max}
 
@@ -98,32 +98,10 @@
 
 \end{frame}
 
-
-%---------------------%
-\subsection{Query Processing}
-\begin{frame}{Query Processing Overview}
-
-\visible<1->{Keywords supplied in a user query will not in general match those used for data representation in the underlying data source. }
-
-\vspace{11pt}
-
-\visible<2->{To achieve superior recall, we must explore many possible \emph{meanings} of a keyword used by the user. }
-
-\vspace{11pt}
-
-\visible<3->{User specified keyword could be ambiguous: could could mean any of a number of entities/predicates in the data. }
-
-\vspace{11pt}
-
-\visible<4->{To achieve superior precision, we must be able to disambiguate the intent of the user query. }
-
-\vspace{11pt}
-
-\visible<5->{Our approach: ask user for help!}
-
-\end{frame}
-
 %-------------------------%
+\section{Query Processing}
+
+\subsection{Overview}
 
 \begin{frame}{Query Processing Overview}
 
@@ -173,8 +151,11 @@
 \end{frame}
 
 %-------------------%
+\section{Implementation}
+\subsection{Predicate Selection}
 
 \begin{frame}{Predicate Selection for predicate $p_{ij}$}
+
 \begin{itemize}
 \item<1-> The system presents a set of candidate predicates that match the given relation keywords $R_{ij}$
 \item<2-> User is expected to select of subset of these predicates that align with her intent
@@ -189,205 +170,330 @@
 \visible<4->{Predicate selection for $p_{ij}$, is performed for each of the relations $x_i \sim x_j$ specified initially by the user.}
 
 \end{frame}
+
+
 %-------------------%
-\begin{frame}{Entity Selection}
-\visible<1->{After we have a set of valid predicates for $p_{ij}$ from the predicate selection step, try to determine the entities $x_i$ and $x_j$ obeying relation $p_{ij}$}
+\begin{frame}{Scoring candidate predicates}
+\begin{align}
+\text{Score}(p|\vec{q})& \propto \psi(p) \cdot \psi(R_{ij},p) \cdot \sum_{t_i,t_j,e_i,e_j} \phi_2(p, R_{ij}, C_i, C_j, K_i, K_j, t_i, t_j, e_i, e_j) \nonumber
+\end{align}
 
-\vspace{11pt}
-
-\visible<2->{The RDF graph is queried to find all entities $x_i$ and $x_j$ that match the triple pattern $\langle x_i, p, x_j \rangle$ ($p$ is one valid predicate for $p_{ij}$)}
-
-\vspace{11pt}
-
-\visible<3->{The set of entities (for $x_i$) is further filtered based on information from selector keywords $K_i$ and category keywords $C_i$.}
-
-\vspace{11pt}
-
-\visible<4->{The resulting set of entities is presented to the user (for selection) as candidate entities}
+where $\phi_2$ is defined as,
+\begin{align}
+\phi_2 =  \psi(t_i,t_j,p) \cdot \psi(C_i,t_i) \cdot \psi(C_j,t_j) \cdot \psi(e_i,e_j,t_i,t_j,p) \cdot \psi(K_i,e_i) \cdot \psi(K_j,e_j) \label{eq:phi2}
+\nonumber
+\end{align}
 
 \end{frame}
+%-------------------%
 
-%------------------%
-\subsection{Query Interpretation}
-\begin{frame}{Query Interpretation}
-\visible<1->{Need to choose a few top predicates (entities) to be exposed to the user in the predicate (entity) selection step.}
-
-\vspace{11pt}
-
-\visible<2->{Need to rank predicates and entities.}
-
-\vspace{11pt}
-
-\visible<3->{We follow a generative approach.}
-
+\begin{frame}{Computing $\psi(p)$}
+\begin{itemize}
+\item Compute frequency of occurrence of each predicate in one pass of the freebase triple dump.
+\item The restricted freebase subset used for our experiments consists of \textbf{6,106} predicates. 
+\item The sum of all frequencies, equals the number of triples in our restricted subset, and is found to be \textbf{827,615,838}.
+\end{itemize}
+For computing $\psi(p)$, we have:
+$$\psi(p) = \frac{\text{freq}(p)}{827,615,838}$$
 \end{frame}
 
 %-------------------%
-\begin{frame}{Predicate Selection}
-\visible<1->{Let $\vec{q} = (R_{ij}, C_i, C_j, K_i, K_j)$ denote the part of the query pertaining to the predicate $p_{ij}$ and entities $x_i$, $x_j$. We are interested in $\argmax_{p}$Pr$(p|\vec{q})$, where}
 
+\begin{frame}{Distribution of $\text{freq}(p)$}
 
-\begin{align*}
-\visible<2->{\text{Pr}(p|\vec{q}) &\propto \text{Pr}(p, \vec{q}) = \text{Pr}(p)\cdot \text{Pr}(\vec{q}|p) = \text{Pr}(p)\cdot \sum_{t_{i}, t_{j}} \text{Pr}(\vec{q}, t_i, t_j | p)} \\
-\visible<3->{&= \text{Pr}(p)\cdot \sum_{t_{i}, t_{j}} \text{Pr}(R_{ij}, C_i, C_j, K_i, K_j, t_i, t_j| p)} \\
-\visible<4->{&= \text{Pr}(p)\cdot \sum_{t_{i}, t_{j}} \text{Pr}(R_{ij}|p)\cdot\underbrace{\text{Pr}(t_i,t_j|R_{ij},p)}_\text{(I)}\cdot\underbrace{\text{Pr}(C_i,C_j|t_i,t_j,R_{ij},p)}_\text{(II)}\cdot \phi_1}
-\end{align*}
-
-
-\visible<5->{where $\phi_1$ is defined as:}
-\begin{align*}
-\visible<6->{\phi_1(K_i,K_j,C_i,C_j,e_i,e_j,t_i,t_j,R_{ij},p) = \text{Pr}(K_i,K_j|C_i,C_j,e_i,e_j,t_i,t_j,R_{ij},p) }
-\end{align*}
+\begin{figure}[h!] \label{preddist}
+\centering
+\includegraphics[width=0.7\textwidth]{./images/pred-freq}
+\caption{Frequency distribution of Freebase predicates. Note that the scale on Y-axis is logarithmic.}
+\end{figure}
 
 \end{frame}
 
+%-------------------%
+\begin{frame}{Computing $\psi(R_{ij},p)$ - Using Lucene/Solr}
+\begin{block}{}
+The potential $\psi(R_{ij},p)$ denotes the compatibility between the relation keywords $R_{ij}$ and the freebase predicate $p$.
+\end{block}
 
-
-%------------------%
-\begin{frame}{Estimating $\text{Pr}(p)$}
-
-\visible<1->{$\text{Pr}(p)$ is simply the prior on the predicate $p$. We estimate it as:}
-\visible<2->{$$\text{Pr}(p) = \frac{\text{freq}(p)}{\sum_{p_i \in \mathbb{P}}\text{freq}(p_i)}$$}
-
-\visible<3->{where $\mathbb{P}$ is the set of all possible predicates in our RDF data source.}
-\end{frame}
-
-
-%------------------%
-\begin{frame}{Estimating $\text{Pr}(R_{ij}| p)$, $\text{Pr}(C_i| t_i)$, $\text{Pr}(K_i| e_i)$}
-
-\visible<1->{Let us start with $\text{Pr}(R_{ij}| p)$}
-
-\vspace{11pt}
-
-\visible<2->{Use an entity-annotated corpus for discovering phrase patterns for predicate $p$}
-
-\visible<3->{E.g. ClueWeb09 corpus annotated with Freebase entities}
-
-
+Construct micro-documents for each of the 6,106 freebase predicates with the following contents:
 \begin{enumerate}
-\visible<4->{\item For each predicate $p$, consider all triples and locate all the corpus sentences that mention both the participating entities of the triple.}
-\visible<5->{\item If the entities $e_i$ and $e_j$ co-occur in a sentence then this sentence is an evidence of the triple $\langle e_i, p, e_j \rangle$}
-\visible<6->{\item Using MaltParser obtain dependency graph for each sentence}
-\visible<7->{\item Words in the path connecting the entities are joined together and added to a candidate phrase dictionary, provided the path is at most 3 hops}
-
-\end{enumerate}
+\item Name of the freebase predicate. For example, for the freebase predicate \url{/people/person/employment_history} the phrase ``employment history" is retained in the micro-document.
+\item Synonyms of the freebase predicate name. WordNet is used to construct the list of synonyms. For example, the synonyms for ``spouse" are: \{``partner", ``married\_person", ``mate", ``better\_half"\}
+.\end{enumerate}
 
 \end{frame}
 
 %-------------------%
-\begin{frame}{Estimating $\text{Pr}(R_{ij}| p)$}
-
-\visible<1->{Thus, we have, for all predicates $p$, a list $\mathbb{R}_{ij}$ of all phrases that are known to hint at $p$.}
-\visible<2->{We can then estimate $\text{Pr}(R_{ij}| p)$ as:}
-
-\begin{align*}
-\visible<3->{\text{Pr}(R_{ij}| p) = \frac{n(p, R_{ij})}{\sum_{R'_{ij} \in \mathbb{R}_{ij}}{n(p, R'_{ij})}}}
-\end{align*}
- \visible<4->{where $n(p, R_{ij})$ represents the number of sentences in which $R_{ij}$ occurred as a phrase in the dependency path between entities participating in relation specified by predicate $p$.}
+\begin{frame}
+Lucene implements a variant of the TfIdf scoring model. The Lucene scores are returned along with the top-$k$ search results--which may be directly used as a proxy for $\psi(R_{ij}, p)$.
 \end{frame}
 
-%--------------------%
-\begin{frame}{Estimating $\text{Pr}(t_i,t_j|p)$}
-\visible<1->{For predicate $p$, we all the triples that it is involved in, and filter those out  in which the connected subject and object have types $t_i$ and $t_j$ respectively. Let $n(p; t_i, t_j)$ be the number of such triples. Then, simply}
-
-\begin{align*}
-\visible<2->{\text{Pr}(t_i,t_j|p) = \frac{n(p; t_i, t_j)}{n(p)}}
-\end{align*}
-\visible<3->{where $n(p)$ denotes the number of triples in Freebase that have $p$ as the predicate.}
-
-\visible<4->{Note that the filtering operation above can be easily carried out in case of Freebase due to the availability of a \texttt{/object/type/} relation for most entities.}
-
-\end{frame}
-
-
-%----------------------%
-
-\begin{frame}{Estimating $\text{Pr}(e_i,e_j|t_i,t_j,p)$}
-
-\visible<1->{Though $\text{Pr}(e_i,e_j | t_i,t_j,p)$ must take into account the $e_i$--$t_i$, and $e_j$--$t_j$ compatibility, we make a simplifying assumption without deviating a lot from the intended semantics of $\text{Pr}(e_i,e_j|t_i,t_j,p)$.}
-
-\visible<2->{Define,}
-\begin{align*}
-\visible<2->{\text{Pr}(e_i,e_j | t_i,t_j,p) = \frac{n(e_i, e_j; p)}{n(p)} }
-\end{align*}
-
-\visible<3->{where $n(e_i, e_j; p) = 1$ if the triple $\langle e_i, p, e_j \rangle$ occurs in the data, otherwise $n(e_i, e_j; p) = 0$.}
-
-\visible<4->{As earlier, $n(p)$ denotes the number of triples that have $p$ as their predicate part.}
-
-\end{frame}
-
-%----------------------%
-
-\begin{frame}{Computation}
-
-\visible<1->{We started off with computing}
-\begin{multline*}
-\visible<2->{\text{Pr}(p) \cdot \sum_{t_i,t_j,e_i,e_j}  \text{Pr}(R_{ij}|p) \cdot \text{Pr}(t_i,t_j|p) \cdot \text{Pr}(C_i|t_i) \cdot \text{Pr}(C_j|t_j)} \\
- \visible<2->{\cdot \text{Pr}(e_i,e_j|t_i,t_j,p) \cdot \text{Pr}(K_i|e_i) \cdot \text{Pr}(K_j|e_j) }
-\end{multline*}
-
-\visible<3->{Note that only $\text{Pr}(e_i, e_j | t_i, t_j, p)$ involves all the summation variables $t_i, t_i, e_i, e_i$ and can be expensive to compute. The summation on the other terms can be computed rather cheaply.}
-
-\vspace{11pt}
-
-\visible<4->{Simply set $\text{Pr}(e_i, e_j | t_i, t_j, p) = 1$. }
-
-
-\visible<5->{The burden of producing a valid \emph{score} rests divided on all the $\text{Pr}$'s involved, and we expect that the results will not be perturbed much on ignoring one of the $\text{Pr}$'s.}
-
-
-\end{frame}
-
-%----------------------%
-\begin{frame}{Score computation}
-
-\visible<1->{The argmax computation that we started off initially with can be replaced by a \emph{score} computation for each of the predicates. }
-
-\vspace{11pt}
-
-\visible<2->{On cleaning our Freebase dataset we ended up with only 6200 distinct predicates}
-
-\vspace{11pt}
-
-\visible<3->{The score computation will be generally feasible, given that several of the quantities can be precomputed and stored.}
-\end{frame}
-
-%-----------------------%
-\begin{frame}{Entity Selection}
-
-\visible<1->{Let $e$ denote a candidate entity (unknown) for the entity variable $e_i$ and let $\vec{q_{e_i}} = (K_i, C_i)$ be the part of the query pertaining directly to $e_i$. As before, we are interested in $\argmax_{e} \text{Pr}(e|\vec{q_{e_i}})$, where}
-
-
-\begin{align*}
-\visible<2->{\text{Pr}(e|\vec{q_{e_i}}) \propto \text{Pr}(e, \vec{q_{e_i}}) & = \text{Pr}(e) \cdot \text{Pr}(\vec{q_{e_i}}|e)}  \\
-\visible<3->{ &= \text{Pr}(e) \cdot \sum_{p_{ij_1}, p_{ij_2},..., p_{ij_r}}\text{Pr}(\vec{q_{e_i}}, p_{ij_1}, p_{ij_2},..., p_{ij_r} | e)} \\
-\visible<4->{&= \text{Pr}(e) \cdot \sum_{p_{ij_1}, p_{ij_2},..., p_{ij_r}}\text{Pr}(K_i, C_i, p_{ij_1}, p_{ij_2},..., p_{ij_r} | e)}
-\end{align*}
-
- \begin{align*}
-\visible<5->{  = \text{Pr}(e) \cdot \sum_{p_{ij_1}, p_{ij_2},..., p_{ij_r}} \text{Pr}(K_i | e) \cdot \text{Pr}(C_i | K_i, e) \cdot \text{Pr}(p_{ij_1}, p_{ij_2},..., p_{ij_r} | C_i, K_i, e) }
-\end{align*}
-
-
-\end{frame}
-
-%-------------------------%
-\begin{frame}{Computation}
-
-\visible<1->{The original equation, when rewritten in product-of-sum form, is not expected to be computationally expensive owing to the following observations: }
-\begin{enumerate}
-  \item<2-> The predicates $p_{ij_1}, p_{ij_r}, ..., p_{ij_r}$ are the predicates that are labels of outgoing edges of entity variable $e_i$ in the query graph. Therefore, for even the most convoluted (and meaningful) queries one can think of, $r$ would be a small number ($< 10$ let's say).
-  \item<3-> The predicate selection step would have been completed for these predicates before entity selection is done for the entity variable $e$. This limits the total number of terms in the sum, allowing for cheap computation of the overall \emph{score}.
-\end{enumerate}
-
+%-------------------%
+\begin{frame}{Computing $\psi(R_{ij},p)$ - Pattern-based approach}
+\begin{block}{}
+ClueWeb09: Text corpus labeled with freebase entities.
+\end{block}
 
 \begin{itemize}
-\item<4-> Do not do scoring for all entities!
-\item<5-> Perform a keyword search using the selector keywords (and their synonyms) of the entity and to perform ranking for the result entities
+\item For each triple instance of each predicate, locate all corpus sentences that mentioned both participating entities. 
+\item Make the assumption that if $<e_1, p, e_2>$ is a triple and $e_1, e_2$ co-occur in a sentence, then this sentence is an evidence of the predicate relationship. 
+\item Each such sentence is parsed to obtain a dependency graph using the Malt Parser.
+\item Words in the path connecting the entities are joined together and added to a candidate phrase dictionary, provided the path is at most three hops.
 \end{itemize}
 
+\end{frame}
+
+%-------------------%
+\begin{frame}{Computing $\psi(R_{ij},p)$ - Pattern-based approach}
+
+Finally, the potential $\psi(R_{ij}, p)$ is computed as:
+$$\psi(R_{ij},p) = \frac{n(p, R_{ij})}{\sum_{R'}{n(p, R')}}$$
+where $R'$ ranges over all phrases that are known to
+hint at $p$, and $n(p, R')$ denotes the number of sentences
+where the phrase $R'$ occurred in the dependency
+path between the entities participating in relation
+$p$. 
+
+\begin{itemize}
+\item Model is simplistic but ideal for freebase-scale data.
+\item Noise in scores mitigated by collective scoring of predicates.
+\end{itemize}
+\end{frame}
+
+%-------------------%
+
+\begin{frame}{Pattern-based approach -- issues}
+
+\begin{itemize}
+\item Sparsity of corpus annotations or the rarity of Freebase triples in ClueWeb09. 
+\item E.g., for the Freebase relation \url{/people/person/profession}, very few annotated sentences are to be found.
+
+\end{itemize}
+One way to address this problem is to utilize relation type names in Freebase to map hints to relation types. Thus, in addition to the corpus-derived relation
+model, we also use a language model that used Freebase relation type names as lemmas. E.g., the word `profession' would contribute to the relation type \url{/people/person/profession}.
+
+\end{frame}
+
+%-------------------%
+\begin{frame}{Example queries -- pattern-based approach}
+
+\textbf{Query 1:} $R_{ij}$ = ``music genre"
+\begin{longtable}{| p{.55\textwidth} | p{.35\textwidth} |} 
+\hline
+\textbf{freebase predicate} & $\psi(\text{``music genre", p})$ \\ \hline \hline
+\url{/music/genre/artists} & -15.099850431212927 \\ \hline 
+\url{/book/magazine/genre} & -20.497121155364283 \\ \hline 
+\url{/computer/software/software_genre} & -22.372291455561907 \\ \hline 
+\url{/music/composition/place_composed} & -22.950699521833275 \\ \hline 
+\url{/music/artist/track} & -23.0148181515611 \\ \hline 
+\url{/music/composition/recordings} & -23.23339044018303 \\ \hline 
+\url{/user/ramanan/default_domain/musical_composer/musical_genre} & -25.10161835390006 \\ \hline 
+\url{/music/composer/compositions} & -25.72076068271463 \\ \hline 
+\url{/theater/play/productions} & -25.96101012469272 \\ \hline 
+
+\end{longtable}
+
+\end{frame}
+%-------------------%
+
+\begin{frame}{Example queries -- pattern-based approach}
+
+\textbf{Query 2:} $R_{ij}$ = ``company founder"
+\begin{longtable}{| p{.55\textwidth} | p{.4\textwidth} |} 
+\hline
+\textbf{freebase predicate} & $\psi(\text{``company founder", p})$ \\ \hline \hline
+\url{/base/ballet/ballet_company/founder} & -13.436401752514346 \\ \hline
+\url{/language/language_dialect/language} & -25.96800589848468 \\ \hline
+\url{/sports/boxer/stance} & -27.002546059199332 \\ \hline
+\url{/cvg/cvg_platform/games} & -27.009525090448083 \\ \hline
+\url{/award/award_presenting_organization/award_categories_presented} & -27.059214681894424 \\ \hline
+\url{/language/conlang/conlang_type} & -27.074404633446704 \\ \hline
+\url{/business/business_location/parent_company} & -27.168006745432432 \\ \hline
+\end{longtable}
+
+\end{frame}
+%-------------------%
+
+
+\begin{frame}{Computing $\psi(R_{ij},p)$}
+\textbf{Concluding Remarks}: Even though the pattern-based approach utilizing ClueWeb09 corpus seems superior to the naive Lucene-based search technique, in practice we observed the latter to be much lighter on resources (and thus, faster) without compromising a lot on the accuracy of scores.
+
+\end{frame}
+%-------------------%
+
+\begin{frame}{Computing $\psi(C_i,t_i)$}
+\begin{block}{}
+The potential $\psi(C_i,t_i)$ captures the compatibility between the category keywords $C_i$ and the freebase type $t_i$.
+\end{block}
+Language model for freebase types:
+\begin{itemize}
+\item Each type is described by one or more phrases through the link \url{/common/topic/alias}.
+\item  We collect these into a micro-document and use a standard Dirichlet-smoothed language model from IR.
+\item Relation types provide additional clues to types of the endpoint entities:
+
+\end{itemize}
+  
+
+\end{frame}
+
+%-------------------%
+\begin{frame}{Type Language Model}
+\begin{itemize}
+\item Freebase relation types have the form \url{/x/y/z}, where \url{x} is the domain of the relation, and \url{y} and \url{z} are string representations of the type of the entities participating in the relation. 
+\item E.g., the (directed) relation type \url{/location/country/capital} connects from from \url{/location/country} to \url{/location/citytown}.
+\item Therefore, ``capital" can be added to the set of descriptive phrases of entity type \url{/location/citytown}.
+\end{itemize}
+\end{frame}
+
+%-------------------%
+\begin{frame}{Example queries -- Type language model}
+\textbf{Query 1:} $C_i$ = ``tv show"
+\begin{longtable}{| p{.4\textwidth} | p{.35\textwidth} |} 
+\hline
+\textbf{freebase type} & $\psi(\text{``tv show"}, t_i)$ \\ \hline \hline
+
+\url{/tv/tv_rating} & -10.378222006687027 \\ \hline
+\url{/tv/tv_soundtrack} & -10.378222006687132 \\ \hline
+\url{/tv/tv_crewmember} & -10.378222006687363 \\ \hline
+\url{/tv/tv_genre} & -10.378222006687558 \\ \hline
+\url{/tv/tv_subject} & -10.378222006687638 \\ \hline
+\url{/tv/video_host} & -10.782944611064888 \\ \hline
+\url{/tv/tv_director} & -10.976166624970492 \\ \hline
+\url{/tv/tv_actor} & -10.976171517623627 \\ \hline
+\url{/tv/tv_song} & -10.976210661821304 \\ \hline
+\url{/tv/tv_producer} & -10.97622044869509 \\ \hline
+\url{/tv/tv_network} & -10.976244917322859 \\ \hline
+\url{/tv/tv_program} & -10.976333021455918 \\ \hline
+
+\end{longtable}
+\end{frame}
+
+%-------------------%
+\begin{frame}{}
+
+\textbf{Query 2:} $C_{i}$ = ``politician"
+
+\begin{longtable}{| p{.5\textwidth} | p{.3\textwidth} |} 
+\hline
+\textbf{freebase type} & $\psi(\text{``politician"}, t_i)$ \\ \hline \hline
+
+\url{/government/politician} & -1.2971579353363734 \\ \hline
+\url{/base/cdnpolitics/politician} & -2.080027054477 \\ \hline
+\url{/base/braziliangovt/politician} & -2.0800270544771795 \\ \hline
+\url{/base/coronationofgeorgevi1937/british_politician_guests} & -2.41161001352015 \\ \hline
+\url{/base/irishpoliticians/irish_politician} & -2.5139595884469133 \\ \hline
+\url{/base/membersofdail/irish_politician} & -2.5139752092688834 \\ \hline
+\url{/base/portuguesepoliticians/politicians_of_the_monarchy} & -2.729032987285807 \\ \hline
+
+\end{longtable}
+
+\end{frame}
+
+%-------------------%
+\begin{frame}{Computing $\psi(K_i, e_i)$}
+Lucene-based search approach:
+
+\begin{itemize}
+\item The micro-document for an entity $e_i$ can utilize the freebase description available for that entity. 
+\item Most freebase entities are linked to their description via the predicate \url{/common/topic/description}. 
+\item In general, the description is available in a number of languages; we restrict ourselves only to the English-language description available for entities.
+\end{itemize}
+
+Lucene-scores returned by querying the Solr index with $K_i$ are used as a proxy for $\psi(K_i, e_i)$.
+\end{frame}
+
+%-------------------%
+\begin{frame}{Computing $\psi(K_i, e_i)$}
+Word Embeddings approach:
+
+\begin{itemize}
+\item Google has made available\footnote{Google Code Archive - word2vec. \\ URL: \url{code.google.com/archive/p/word2vec/}} pre-trained entity vectors with freebase naming. 
+\item The word2vec `distance' function can be called to return the freebase entities with the least cosine distance from the keyword query $K_i$ and the cosine distance itself can be used in lieu of $\psi(K_i,e_i)$. 
+\end{itemize}
+\end{frame}
+
+%-------------------%
+\begin{frame}{Computing $\psi(t_i, t_j, p)$}
+Recall that we defined, $$\psi(t_i, t_j, p) = \frac{n(p;t_i,t_j)}{n(p)}$$ 
+where,
+\begin{itemize} 
+\item $n(p;t_i,t_j)$ denotes the number of triples in freebase that contain the predicate $p$ and whose subject and object have the freebase types $t_i$ and $t_j$ respectively 
+\item $n(p)$ as before, denotes the number of freebase triples containing $p$ as the predicate.
+\end{itemize}
+
+\end{frame}
+
+%-------------------%
+\begin{frame}{Computing $\psi(t_i, t_j, p)$}
+
+\begin{itemize}
+\item Iterate over the freebase triples dump and create a new intermediate dump in which each of the subject and object are replaced by their respective freebase types. 
+\begin{itemize} \item To speed up this replacement pass, we were required to maintain an in-memory dictionary mapping each freebase entity to its freebase type. 
+\item In case the object part of the triple was not found to be a freebase url, we simply ignored the triple.
+\end{itemize}
+
+\item Perform an external merge-sort of the dump to cluster together the rows with same value of $(t_i,t_j,p)$. 
+\item A final pass computed the quantity $n(p;t_i,t_j)$ by counting the number of adjacent rows with the same value of $(t_i, t_j,p)$.
+
+\end{itemize}
+
+The final $n(p;t_i,t_j)$ values are stored in a PostgreSQL table, along with $n(p)$ values in another table. The two quantities are retrieved from PostgreSQL to compute $\psi(t_i,t_j,p)$ when required during query processing.
+
+\end{frame}
+
+
+%-------------------%
+\begin{frame}{Score computation for predicate selection}
+
+\begin{itemize}
+\item Summation over ($t_i$, $t_j$, $e_i$, $e_j$) tuples is likely to be infeasible within reasonable expectations of query processing time. 
+\item For our prototype implementation, we drop the summation over $e_i$, $e_j$ by simply setting $\psi(e_i,e_j,t_i,	t_j,p) = 1$, $\psi(K_i,e_i) = 1$, and $\psi(K_j,e_j)$.
+\end{itemize}
+
+Our simplified scoring model for predicates is thus, 
+\begin{align}
+\text{Score}(p|\vec{q}) \propto \psi(p) \cdot \psi(R_{ij},p) \cdot \sum_{t_i,t_j} \psi(C_i,t_i) \cdot \psi(C_j,t_j) \cdot \psi(t_i,t_j,p) \nonumber
+\end{align}
+
+\end{frame}
+
+%-------------------%
+\begin{frame}{Predicate selection}
+
+We use Lucene scores as a proxy for $\psi(R_{ij}, p)$.
+\begin{itemize}
+\item An Apache Solr index is built on micro-documents (one for each freebase predicate) containing WordNet synsets of the freebase predicate name. 
+\item Relation keywords $R_{ij}$ are used to retrieve the top-100 freebase predicates along with their Lucene scores by querying the Solr index.
+\end{itemize}
+
+
+The type language model as discussed previously is used for $\psi(C_i,t_i)$:
+\begin{itemize}
+\item The language model for types is queried by $C_i$ and $C_j$ to return two list of candidate types (along with $\psi(C_i,t_i)$ scores) of the formal types $t_i$ and $t_j$.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Predicate selection}
+\begin{itemize}
+\item Probe each combination of $(t_i,t_j,p)$  and fetch $\psi(t_i,t_j,p)$ using a PostgreSQL query. 
+\item The product $\psi(C_i,t_i) \cdot \psi(C_j,t_j) \cdot \psi(t_i,t_j,p)$ is  marginalized by summing over all candidate types for $t_i$ and $t_j$.
+ 
+\item The list of predicate scores thus obtained is sorted, and the top-100 predicates are sent to the user for selection. 
+\item The user may select one or more of these predicates, thereby concluding one predicate selection step.	
+\end{itemize}
+\end{frame}
+
+%-------------------%
+\begin{frame}{Entity Selection}
+We make use of the selector keywords $K_i$ for producing a ranked list of entities for further selection by the user.
+
+$ \psi(K_i,e_i)$ as previously described is used for producing the ranked list.
+
+\begin{itemize}
+\item Micro-documents containing freebase entity descripton are 
+\end{itemize} 
 \end{frame}
 
 %-------------------------%
@@ -411,7 +517,7 @@
 \section{Conclusion}
 \begin{frame}{Conclusion}
 \begin{itemize}
-\item<1-> The Entity Relationship Keyword Querying framework, provides a powerful combination of ease-of-use and capability of processing complicated queries
+\item<1-> The Entity Relationship Keyword Querying framework, provides a powerful combination of ease-of-use and capability of processing complicated queries.
 
 \end{itemize}
 \end{frame}
