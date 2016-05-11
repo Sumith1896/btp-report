@@ -101,6 +101,11 @@
 %-------------------------%
 \section{Query Processing}
 
+\begin{frame}
+  \tableofcontents[currentsection,hideallsubsections]
+\end{frame}
+
+%------------------------%
 \subsection{Overview}
 
 \begin{frame}{Query Processing Overview}
@@ -150,8 +155,20 @@
 }
 \end{frame}
 
+
+
+
 %-------------------%
 \section{Implementation}
+
+
+
+
+\begin{frame}
+  \tableofcontents[currentsection,hideallsubsections]
+\end{frame}
+
+%--------------------------%
 \subsection{Predicate Selection}
 
 \begin{frame}{Predicate Selection for predicate $p_{ij}$}
@@ -170,6 +187,7 @@
 \visible<4->{Predicate selection for $p_{ij}$, is performed for each of the relations $x_i \sim x_j$ specified initially by the user.}
 
 \end{frame}
+
 
 
 %-------------------%
@@ -312,6 +330,49 @@ model, we also use a language model that used Freebase relation type names as le
 \end{longtable}
 
 \end{frame}
+
+
+%-------------------%
+
+\begin{frame}{Example queries for $R_{ij}$ -- Solr based approach}
+
+\textbf{Query 1:} $R_{ij}$ = ``music genre"
+\begin{longtable}{| p{.55\textwidth} | p{.4\textwidth} |}
+\hline
+\textbf{freebase predicate} & $\psi(\text{``music genre", p})$ \\ \hline \hline
+\url{/music/music_video_genre/music_videos_of_this_genre} & 3.995606 \\ \hline
+\url{/music/music_video/music_video_genre} & 3.995606 \\ \hline
+\url{/music/music_video_choreographer/music_videos_choreographed} & 1.8530477 \\ \hline
+\url{/film/film/music} & 1.4824381 \\ \hline
+\url{/music/music_video_director/music_videos_directed} & 1.4824381 \\ \hline
+\url{/book/book/genre} & 1.4766241 \\ \hline
+\url{/book/magazine/genre} & 1.4766241 \\ \hline
+\url{/book/short_story/genre} & 1.4766241 \\ \hline
+\end{longtable}
+
+\end{frame}
+
+
+%-------------------%
+
+\begin{frame}{Example queries for $R_{ij}$ -- Solr based approach}
+
+\textbf{Query 2:} $R_{ij}$ = ``company founder"
+\begin{longtable}{| p{.55\textwidth} | p{.4\textwidth} |}
+\hline
+\textbf{freebase predicate} & $\psi(\text{``company founder", p})$ \\ \hline \hline
+\url{/people/family/founder} & 1.8162646 \\ \hline
+\url{/food/cheese/farm_company} & 1.2482804 \\ \hline
+\url{/automotive/manufacturing_plant/company} & 1.2420233 \\ \hline
+\url{/business/company_brand_relationship/company} & 1.2420233 \\ \hline
+\url{/business/company_name_change/company} & 1.2420233 \\ \hline
+\url{/business/company_product_line_relationship/company} & 1.2420233 \\ \hline
+\url{/business/company_product_relationship/company} & 1.2420233 \\ \hline
+\end{longtable}
+
+\end{frame}
+
+
 %-------------------%
 
 
@@ -492,34 +553,32 @@ We make use of the selector keywords $K_i$ for producing a ranked list of entiti
 $ \psi(K_i,e_i)$ as previously described is used for producing the ranked list.
 
 \begin{itemize}
-\item Micro-documents containing freebase entity descripton are
+\item Micro-documents containing freebase entity description and aliases are constructed.
+\item Solr index built on these micro-documents is queried with $K_i$.
+\item Score returned by Solr for ranked entities is used as $ \psi(K_i,e_i)$.
 \end{itemize}
 \end{frame}
 
 %-------------------------%
 \begin{frame}{Result of the query}
 
-
-\visible<1->{At this stage, we have a set of selected entities for each entity variable sought by the query, and also a set of selected predicates for each of the relations between pairs entity variables in the query.}
-
-\vspace{11pt}
-
-\visible<2->{Compute the join of selected entity set of $e_i$ with those of its immediate neighbors in the query graph.}
-
-\vspace{11pt}
-\visible<3->{Further filtering may be required to discard (entity-predicate-entity) tuples that do not have matching triples in the data.}
-
-
+\begin{itemize}
+\item Result graph is formed by joining the sets of selected entities and predicates.
+\item Care is taken to  ensure that all edges of the result graph are evidenced as triples in the freebase dump.
+\item Result graphs are ranked by graph score = product of scores of all entities and predicates in the graph.
+\end{itemize}
 \end{frame}
 
 
 %-------------------------%
-\section{Conclusion}
-\begin{frame}{Conclusion}
-\begin{itemize}
-\item<1-> The Entity Relationship Keyword Querying framework, provides a powerful combination of ease-of-use and capability of processing complicated queries.
+\section{Demo}
+\begin{frame}{Demo}
 
-\end{itemize}
+%\begin{block}{}
+\begin{center}
+\huge Prototype Demonstration
+\end{center}
+%\end{block}
 \end{frame}
 
 
